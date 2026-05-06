@@ -31,9 +31,9 @@ for the NUCLEO-F446RE board.
 
 ## First milestones
 
-1. Keep the existing blink application building in the new layout.
-2. Add static task creation and per-task stacks.
-3. Implement cooperative `rtos_yield()` through PendSV.
+1. Keep the existing blink application building in the new layout. Done.
+2. Add static task creation and per-task stacks. Done.
+3. Implement cooperative `rtos_yield()` through PendSV. Done.
 4. Add SysTick and round-robin preemption.
 5. Add `rtos_sleep()` so tasks block instead of spinning.
 6. Add critical sections and basic synchronization primitives.
@@ -46,3 +46,7 @@ current task stack pointer.
 
 SysTick should request scheduling, and PendSV should perform the context
 switch at the lowest interrupt priority.
+
+The first cooperative implementation starts the initial task directly from
+Thread mode using PSP, then uses PendSV for subsequent task switches. A later
+milestone can replace that bootstrap with an SVC-based start path.

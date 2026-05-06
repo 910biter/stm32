@@ -30,7 +30,7 @@ ASM_SOURCES := \
 OBJECTS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
 OBJECTS += $(ASM_SOURCES:%.S=$(BUILD_DIR)/%.o)
 
-.PHONY: all clean flash debug openocd
+.PHONY: all clean flash debug openocd probe
 
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
 
@@ -57,6 +57,9 @@ flash: all
 
 openocd:
 	$(OPENOCD) -f openocd.cfg
+
+probe:
+	$(OPENOCD) -f openocd.cfg -f tools/probe_counters.openocd
 
 debug: all
 	$(GDB) $(BUILD_DIR)/$(TARGET).elf -ex "target extended-remote localhost:3333"

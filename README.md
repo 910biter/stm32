@@ -59,6 +59,17 @@ monitor reset run
 quit
 ```
 
+## Probe task switching
+
+After flashing, run:
+
+```sh
+make probe
+```
+
+The probe script lets the firmware run for two seconds, halts the MCU, and
+prints the two demo task counters from SRAM.
+
 ## Bare-metal structure
 
 - `app/main.c` contains the current blink application.
@@ -72,8 +83,8 @@ quit
 
 ## RTOS milestones
 
-1. Keep blink working in the new project layout.
-2. Add cooperative task switching with independent task stacks and PendSV.
+1. Keep blink working in the new project layout. Done.
+2. Add cooperative task switching with independent task stacks and PendSV. Done.
 3. Add SysTick-based preemption.
 4. Add `rtos_sleep()` and blocked task wakeup.
 5. Add critical sections, then semaphores, mutexes, and queues.

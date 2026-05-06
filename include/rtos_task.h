@@ -20,4 +20,9 @@ typedef struct rtos_task {
     struct rtos_task *next;
 } rtos_task_t;
 
+extern rtos_task_t *rtos_current_task;
+
+void rtos_schedule_next(void);
+void rtos_task_exit(void);
+
 #endif
