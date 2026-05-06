@@ -9,10 +9,26 @@ OPENOCD := openocd
 
 CPU := -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 CFLAGS := $(CPU) -std=c11 -Wall -Wextra -Werror -O0 -g3 -ffunction-sections -fdata-sections
-LDFLAGS := $(CPU) -T linker.ld -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
+CFLAGS += -Iinclude -Iboard -Iport/cortex_m4
+ASFLAGS := $(CPU) -g3
+LDSCRIPT := ld/stm32f446re.ld
+LDFLAGS := $(CPU) -T $(LDSCRIPT) -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
 
-SOURCES := startup_stm32f4.c main.c
-OBJECTS := $(SOURCES:%.c=$(BUILD_DIR)/%.o)
+C_SOURCES := \
+	app/main.c \
+	board/board.c \
+	kernel/list.c \
+	kernel/sched.c \
+	kernel/task.c \
+	kernel/tick.c \
+	port/cortex_m4/port.c \
+	startup/startup_stm32f4.c
+
+ASM_SOURCES := \
+	port/cortex_m4/port_asm.S
+
+OBJECTS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
+OBJECTS += $(ASM_SOURCES:%.S=$(BUILD_DIR)/%.o)
 
 .PHONY: all clean flash debug openocd
 
@@ -22,9 +38,14 @@ $(BUILD_DIR):
 	mkdir -p $@
 
 $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) linker.ld
+$(BUILD_DIR)/%.o: %.S | $(BUILD_DIR)
+	mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) $(LDSCRIPT)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	$(SIZE) $@
 

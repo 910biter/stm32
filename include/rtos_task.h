@@ -1,0 +1,23 @@
+#ifndef RTOS_TASK_H
+#define RTOS_TASK_H
+
+#include <stdint.h>
+
+typedef void (*rtos_task_entry_t)(void *arg);
+
+typedef enum {
+    RTOS_TASK_READY = 0,
+    RTOS_TASK_RUNNING,
+    RTOS_TASK_BLOCKED,
+} rtos_task_state_t;
+
+typedef struct rtos_task {
+    uint32_t *sp;
+    uint32_t *stack_base;
+    uint32_t stack_words;
+    uint32_t delay_ticks;
+    rtos_task_state_t state;
+    struct rtos_task *next;
+} rtos_task_t;
+
+#endif

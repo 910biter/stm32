@@ -1,7 +1,8 @@
-# NUCLEO-F446RE bare-metal blink
+# STM32F446RE mini RTOS lab
 
-This is a minimal register-level STM32F446RE program for the NUCLEO board.
-It blinks the onboard LD2 LED on PA5.
+This repository starts as a minimal register-level STM32F446RE program for the
+NUCLEO-F446RE board. The current milestone keeps the onboard LD2 LED blink
+working while the project is being shaped into a small RTOS.
 
 ## Build
 
@@ -60,14 +61,26 @@ quit
 
 ## Bare-metal structure
 
-- `startup_stm32f4.c` defines the vector table and `Reset_Handler`.
+- `app/main.c` contains the current blink application.
+- `board/board.c` owns NUCLEO-F446RE board setup and LD2 control.
+- `board/stm32f446re.h` contains the small register map used so far.
+- `startup/startup_stm32f4.c` defines the vector table and `Reset_Handler`.
 - `Reset_Handler` copies `.data` from flash to RAM, clears `.bss`, then calls `main`.
-- `linker.ld` places the vector table and code at `0x08000000`, and RAM at `0x20000000`.
-- `main.c` enables the GPIOA peripheral clock, configures PA5 as output, then toggles it through `GPIOA_BSRR`.
+- `ld/stm32f446re.ld` places the vector table and code at `0x08000000`, and RAM at `0x20000000`.
+- `kernel/` is reserved for task, scheduler, tick, and list code.
+- `port/cortex_m4/` is reserved for Cortex-M4 context switching, PendSV, SysTick, and critical sections.
+
+## RTOS milestones
+
+1. Keep blink working in the new project layout.
+2. Add cooperative task switching with independent task stacks and PendSV.
+3. Add SysTick-based preemption.
+4. Add `rtos_sleep()` and blocked task wakeup.
+5. Add critical sections, then semaphores, mutexes, and queues.
 
 ## Typical edit loop
 
-1. Change `main.c`.
+1. Change code under `app/`, `board/`, `kernel/`, or `port/`.
 2. Run `make`.
 3. Run `make flash`.
 4. For debugging, keep `make openocd` running and attach with `make debug`.
