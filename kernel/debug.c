@@ -4,10 +4,14 @@
 
 volatile uint32_t rtos_debug_snapshot_count;
 volatile rtos_task_snapshot_t rtos_debug_snapshots[RTOS_MAX_TASKS];
+volatile rtos_cpu_usage_snapshot_t rtos_cpu_usage_snapshot;
 
 void rtos_debug_update(void)
 {
     uint32_t count = rtos_task_count();
+    uint32_t idle_ticks = 0;
+    uint32_t total_ticks;
+    uint32_t active_ticks;
 
     if (count > RTOS_MAX_TASKS) {
         count = RTOS_MAX_TASKS;
@@ -30,9 +34,28 @@ void rtos_debug_update(void)
         rtos_debug_snapshots[i].stack_guard_ok = (uint32_t)rtos_task_stack_guard_ok(task);
         rtos_debug_snapshots[i].switch_count = task->switch_count;
         rtos_debug_snapshots[i].run_ticks = task->run_ticks;
+
+        if (task->base_priority == RTOS_IDLE_PRIORITY) {
+            idle_ticks += task->run_ticks;
+        }
     }
 
     rtos_debug_snapshot_count = count;
+    total_ticks = rtos_tick_count();
+    if (idle_ticks > total_ticks) {
+        idle_ticks = total_ticks;
+    }
+    active_ticks = total_ticks - idle_ticks;
+    rtos_cpu_usage_snapshot.total_ticks = total_ticks;
+    rtos_cpu_usage_snapshot.idle_ticks = idle_ticks;
+    rtos_cpu_usage_snapshot.active_ticks = active_ticks;
+    if (total_ticks != 0U) {
+        rtos_cpu_usage_snapshot.idle_permille = (idle_ticks * 1000U) / total_ticks;
+        rtos_cpu_usage_snapshot.active_permille = (active_ticks * 1000U) / total_ticks;
+    } else {
+        rtos_cpu_usage_snapshot.idle_permille = 0;
+        rtos_cpu_usage_snapshot.active_permille = 0;
+    }
     rtos_object_debug_update();
 }
 
@@ -70,4 +93,20 @@ uint32_t rtos_debug_snapshot(rtos_task_snapshot_t *out, uint32_t max_count)
     rtos_exit_critical();
 
     return count;
+}
+
+rtos_cpu_usage_snapshot_t rtos_debug_cpu_usage_snapshot(void)
+{
+    rtos_cpu_usage_snapshot_t snapshot;
+
+    rtos_enter_critical();
+    rtos_debug_update();
+    snapshot.total_ticks = rtos_cpu_usage_snapshot.total_ticks;
+    snapshot.idle_ticks = rtos_cpu_usage_snapshot.idle_ticks;
+    snapshot.active_ticks = rtos_cpu_usage_snapshot.active_ticks;
+    snapshot.idle_permille = rtos_cpu_usage_snapshot.idle_permille;
+    snapshot.active_permille = rtos_cpu_usage_snapshot.active_permille;
+    rtos_exit_critical();
+
+    return snapshot;
 }

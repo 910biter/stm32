@@ -61,7 +61,8 @@ for the NUCLEO-F446RE board.
 28. Add scheduler lock. Done.
 29. Add ISR-safe wake APIs. Done.
 30. Add idle hooks. Done.
-31. Add CPU usage snapshots.
+31. Add CPU usage snapshots. Done.
+32. Add task notifications.
 
 ## Cortex-M context switch model
 
@@ -222,3 +223,10 @@ Idle hooks let the application run a short callback whenever the idle task is
 selected. The hook runs in Thread mode at idle priority, before the idle task
 executes `wfi`. It must not block, but it can maintain low-cost counters or
 enter board-specific low-power preparation code.
+
+CPU usage snapshots summarize scheduler activity with tick totals, idle ticks,
+active ticks, and idle/active permille values. They are computed during debug
+snapshot refreshes from each task's accumulated `run_ticks`, giving OpenOCD a
+quick tick-sampled view of whether the system is mostly idle or busy. Very
+short tasks can finish between SysTick interrupts, so this is a coarse system
+health metric rather than a cycle-accurate profiler.

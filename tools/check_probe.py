@@ -23,6 +23,7 @@ def load_probe(path):
     fault = None
     object_count = None
     objects = {}
+    cpu_usage = None
 
     with open(path, "r", encoding="utf-8", errors="replace") as log:
         for raw_line in log:
@@ -48,11 +49,15 @@ def load_probe(path):
                 object_count = parse_int(line.split("=", 1)[1])
                 continue
 
+            if line.startswith("cpu:"):
+                cpu_usage = parse_pairs(line)
+                continue
+
             object_match = OBJECT_RE.match(line)
             if object_match:
                 objects[int(object_match.group(1))] = parse_pairs(object_match.group(2))
 
-    return counters, tasks, assertion, fault, object_count, objects
+    return counters, tasks, assertion, fault, object_count, objects, cpu_usage
 
 
 def require(errors, condition, message):
@@ -60,7 +65,7 @@ def require(errors, condition, message):
         errors.append(message)
 
 
-def check_probe(counters, tasks, assertion, fault, object_count, objects):
+def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_usage):
     errors = []
 
     require(errors, counters is not None, "missing task counters line")
@@ -68,6 +73,7 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects):
     require(errors, fault is not None, "missing fault line")
     require(errors, bool(tasks), "missing task snapshot lines")
     require(errors, object_count is not None, "missing object count line")
+    require(errors, cpu_usage is not None, "missing CPU usage line")
 
     if counters is not None:
         require(errors, counters.get("produced", 0) >= 5, "producer did not run enough times")
@@ -126,6 +132,14 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects):
             require(errors, obj.get("object", 0) != 0, f"object{index} has no object pointer")
             require(errors, obj.get("name", 0) != 0, f"object{index} has no debug name")
 
+    if cpu_usage is not None:
+        require(errors, cpu_usage.get("total", 0) >= 1500, "CPU usage total ticks is too low")
+        require(errors, cpu_usage.get("idle", 0) >= 1000, "CPU usage did not observe enough idle time")
+        require(errors, cpu_usage.get("idle", 0) + cpu_usage.get("active", 0) == cpu_usage.get("total", 0),
+                "CPU usage idle and active ticks do not sum to total")
+        require(errors, cpu_usage.get("idle_permille", 0) >= 900,
+                "CPU usage expected this demo to be mostly idle")
+
     return errors
 
 
@@ -133,8 +147,8 @@ def main():
     if len(sys.argv) != 2:
         raise SystemExit("usage: check_probe.py <probe.log>")
 
-    counters, tasks, assertion, fault, object_count, objects = load_probe(sys.argv[1])
-    errors = check_probe(counters, tasks, assertion, fault, object_count, objects)
+    counters, tasks, assertion, fault, object_count, objects, cpu_usage = load_probe(sys.argv[1])
+    errors = check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_usage)
     if errors:
         print("probe checks failed:")
         for error in errors:

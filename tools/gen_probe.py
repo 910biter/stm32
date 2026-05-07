@@ -75,6 +75,7 @@ def main():
     emit_mem("pool_state", symbol(symbols, "demo_pool"), 7)
     emit_mem("debug_count", symbol(symbols, "rtos_debug_snapshot_count"), 1)
     emit_mem("snapshots", symbol(symbols, "rtos_debug_snapshots"), max_tasks * SNAPSHOT_WORDS)
+    emit_mem("cpu_usage", symbol(symbols, "rtos_cpu_usage_snapshot"), 5)
     emit_mem("object_count", symbol(symbols, "rtos_object_snapshot_count"), 1)
     emit_mem("object_snapshots", symbol(symbols, "rtos_object_snapshots"), max_objects * OBJECT_SNAPSHOT_WORDS)
     emit_mem("tick_state", symbol(symbols, "tick_count"), 1)
@@ -90,6 +91,7 @@ def main():
         args = " ".join(f"$snapshots({base + field})" for field in range(SNAPSHOT_WORDS))
         print(f'echo [format "task{task_index}: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d guard=%u switches=%u run_ticks=%u" {args}]')
 
+    print('echo [format "cpu: total=%u idle=%u active=%u idle_permille=%u active_permille=%u" $cpu_usage(0) $cpu_usage(1) $cpu_usage(2) $cpu_usage(3) $cpu_usage(4)]')
     print('echo [format "object_count=%u" $object_count(0)]')
     for object_index in range(max_objects):
         base = object_index * OBJECT_SNAPSHOT_WORDS
