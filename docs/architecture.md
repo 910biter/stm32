@@ -50,7 +50,8 @@ for the NUCLEO-F446RE board.
 17. Add stack overflow checks. Done.
 18. Add software timers. Done.
 19. Add event flags. Done.
-20. Add memory pools.
+20. Add memory pools. Done.
+21. Add task lifecycle management.
 
 ## Cortex-M context switch model
 
@@ -150,3 +151,9 @@ Event flags are `uint32_t` bit sets with wait-any and wait-all modes. Waiting
 tasks can optionally clear the matched bits on exit and can use the same timeout
 path as queues, semaphores, and mutexes. Setting flags wakes every waiter whose
 condition is satisfied.
+
+Memory pools provide fixed-size block allocation without heap fragmentation.
+Each pool owns caller-provided storage and links free blocks through the first
+word of each block. Allocation can return immediately or block with the common
+timeout path. Freeing a block hands it directly to the oldest valid waiter when
+one exists, otherwise the block returns to the free list.

@@ -21,6 +21,7 @@ C_SOURCES := \
 	kernel/debug.c \
 	kernel/event.c \
 	kernel/list.c \
+	kernel/mempool.c \
 	kernel/mutex.c \
 	kernel/queue.c \
 	kernel/sched.c \

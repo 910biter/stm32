@@ -110,7 +110,8 @@ delay, state, wait result, and effective priority.
 16. Add stack overflow checks. Done.
 17. Add software timers. Done.
 18. Add event flags. Done.
-19. Add memory pools.
+19. Add memory pools. Done.
+20. Add task lifecycle management.
 
 ## Typical edit loop
 

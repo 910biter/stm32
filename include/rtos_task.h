@@ -27,6 +27,7 @@ typedef struct rtos_task {
     uint32_t wait_flags_result;
     uint32_t wait_flags_all;
     uint32_t wait_flags_clear;
+    void *wait_object_result;
 } rtos_task_t;
 
 extern rtos_task_t *rtos_current_task;
