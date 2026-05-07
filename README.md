@@ -106,7 +106,8 @@ delay, state, wait result, and effective priority.
 12. Add an SVC-based scheduler start path. Done.
 13. Add basic fault diagnostics. Done.
 14. Add timeouts for blocking primitives. Done.
-15. Add runtime assertions.
+15. Add runtime assertions. Done.
+16. Add stack overflow checks.
 
 ## Typical edit loop
 

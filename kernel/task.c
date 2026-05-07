@@ -37,6 +37,8 @@ int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority
     uint32_t *stack = task_stacks[task_count];
     uint32_t *sp = align_stack(stack + RTOS_TASK_STACK_WORDS);
 
+    RTOS_ASSERT((((uintptr_t)sp) & 0x7U) == 0U);
+
     for (uint32_t i = 0; i < RTOS_TASK_STACK_WORDS; ++i) {
         stack[i] = STACK_FILL_PATTERN;
     }

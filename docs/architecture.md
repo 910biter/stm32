@@ -46,7 +46,8 @@ for the NUCLEO-F446RE board.
 13. Add an SVC-based scheduler start path. Done.
 14. Add basic fault diagnostics. Done.
 15. Add timeouts for blocking primitives. Done.
-16. Add runtime assertions.
+16. Add runtime assertions. Done.
+17. Add stack overflow checks.
 
 ## Cortex-M context switch model
 
@@ -121,3 +122,9 @@ and an optional delay. The tick handler marks timed-out tasks ready with
 before returning. Wake paths also skip waiters that already timed out, which
 keeps object queues consistent when a timeout races with a post, send, receive,
 or unlock.
+
+Runtime assertions use `RTOS_ASSERT()`. An assertion failure disables
+interrupts, records the expression, file, line, tick count, and current task in
+`rtos_assert_info`, then parks the CPU. The scheduler now asserts that a ready
+task was found, which should always hold because `rtos_start()` creates an idle
+task.

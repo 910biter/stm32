@@ -67,6 +67,11 @@ void rtos_schedule_next(void)
         scan_task = scan_task->next;
     } while (scan_task != old_task->next);
 
+    RTOS_ASSERT(best_task != 0);
+    if (best_task == 0) {
+        return;
+    }
+
     best_task->state = RTOS_TASK_RUNNING;
     rtos_current_task = best_task;
 }

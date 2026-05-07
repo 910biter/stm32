@@ -1,6 +1,7 @@
 #ifndef RTOS_H
 #define RTOS_H
 
+#include "rtos_assert.h"
 #include "rtos_debug.h"
 #include "rtos_fault.h"
 #include "rtos_mutex.h"

@@ -8,12 +8,15 @@ mem2array mutex_state 32 0x20000044 2
 mem2array sem_state 32 0x20000054 4
 mem2array debug_count 32 0x20000064 1
 mem2array snapshots 32 0x20000068 44
-mem2array kernel_state 32 0x200009d0 3
-mem2array fault_info 32 0x200009dc 17
-echo [format "task counters: produced=%u consumed=%u boost_count=%u timeout_count=%u queue_count=%u timeout_sem_count=%u mutex_owner=0x%08x mutex_lock_count=%u tick=%u critical_nesting=%u saved_primask=%u snapshot_count=%u" $counters(0) $counters(1) $counters(2) $counters(3) $queue_state(2) $sem_state(0) $mutex_state(0) $mutex_state(1) $kernel_state(0) $kernel_state(1) $kernel_state(2) $debug_count(0)]
+mem2array tick_state 32 0x200009d0 1
+mem2array assert_info 32 0x200009d4 6
+mem2array kernel_state 32 0x200009ec 2
+mem2array fault_info 32 0x200009f4 17
+echo [format "task counters: produced=%u consumed=%u boost_count=%u timeout_count=%u queue_count=%u timeout_sem_count=%u mutex_owner=0x%08x mutex_lock_count=%u tick=%u critical_nesting=%u saved_primask=%u snapshot_count=%u" $counters(0) $counters(1) $counters(2) $counters(3) $queue_state(2) $sem_state(0) $mutex_state(0) $mutex_state(1) $tick_state(0) $kernel_state(0) $kernel_state(1) $debug_count(0)]
 echo [format "task0: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d" $snapshots(0) $snapshots(1) $snapshots(2) $snapshots(3) $snapshots(4) $snapshots(5) $snapshots(6) $snapshots(7) $snapshots(8) $snapshots(9) $snapshots(10)]
 echo [format "task1: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d" $snapshots(11) $snapshots(12) $snapshots(13) $snapshots(14) $snapshots(15) $snapshots(16) $snapshots(17) $snapshots(18) $snapshots(19) $snapshots(20) $snapshots(21)]
 echo [format "task2: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d" $snapshots(22) $snapshots(23) $snapshots(24) $snapshots(25) $snapshots(26) $snapshots(27) $snapshots(28) $snapshots(29) $snapshots(30) $snapshots(31) $snapshots(32)]
 echo [format "task3: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d" $snapshots(33) $snapshots(34) $snapshots(35) $snapshots(36) $snapshots(37) $snapshots(38) $snapshots(39) $snapshots(40) $snapshots(41) $snapshots(42) $snapshots(43)]
+echo [format "assert: active=%u expression=0x%08x file=0x%08x line=%u tick=%u task=0x%08x" $assert_info(0) $assert_info(1) $assert_info(2) $assert_info(3) $assert_info(4) $assert_info(5)]
 echo [format "fault: active=%u exc_return=0x%08x sp=0x%08x pc=0x%08x lr=0x%08x xpsr=0x%08x cfsr=0x%08x hfsr=0x%08x bfar=0x%08x mmfar=0x%08x" $fault_info(0) $fault_info(1) $fault_info(2) $fault_info(9) $fault_info(8) $fault_info(10) $fault_info(11) $fault_info(12) $fault_info(15) $fault_info(16)]
 shutdown
