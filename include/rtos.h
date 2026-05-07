@@ -3,6 +3,7 @@
 
 #include "rtos_assert.h"
 #include "rtos_debug.h"
+#include "rtos_event.h"
 #include "rtos_fault.h"
 #include "rtos_mutex.h"
 #include "rtos_queue.h"

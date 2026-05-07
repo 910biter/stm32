@@ -49,7 +49,8 @@ for the NUCLEO-F446RE board.
 16. Add runtime assertions. Done.
 17. Add stack overflow checks. Done.
 18. Add software timers. Done.
-19. Add event flags.
+19. Add event flags. Done.
+20. Add memory pools.
 
 ## Cortex-M context switch model
 
@@ -144,3 +145,8 @@ timer list. SysTick decrements active timers and invokes the callback when the
 period expires. Callbacks run in interrupt context, so they must stay short and
 must not call blocking RTOS APIs. The demo uses a 500 ms periodic timer that
 increments a SRAM counter.
+
+Event flags are `uint32_t` bit sets with wait-any and wait-all modes. Waiting
+tasks can optionally clear the matched bits on exit and can use the same timeout
+path as queues, semaphores, and mutexes. Setting flags wakes every waiter whose
+condition is satisfied.
