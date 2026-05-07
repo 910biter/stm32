@@ -65,7 +65,8 @@ for the NUCLEO-F446RE board.
 32. Add task notifications. Done.
 33. Add deferred interrupt work. Done.
 34. Add trace ring buffer. Done.
-35. Add kernel API cleanup docs.
+35. Add kernel API cleanup docs. Done.
+36. Final validation and demo polish.
 
 ## Cortex-M context switch model
 
@@ -253,3 +254,9 @@ SRAM. It currently captures scheduler switches, task notifications, deferred
 work submissions, and deferred work execution. OpenOCD reads the ring alongside
 the task and object snapshots, giving a small flight recorder without UART or
 semihosting.
+
+The API notes in `docs/api.md` collect the public surface into one place:
+task creation, scheduler locking, synchronization objects, ISR-safe calls, task
+notifications, timers, deferred work, and debug/probe helpers. This keeps the
+learning path separate from the implementation details in this architecture
+document.

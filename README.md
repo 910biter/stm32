@@ -99,6 +99,7 @@ state, and HardFault state.
 - `ld/stm32f446re.ld` places the vector table and code at `0x08000000`, and RAM at `0x20000000`.
 - `kernel/` owns task, scheduler, tick, sync, and debug snapshot code.
 - `port/cortex_m4/` is reserved for Cortex-M4 context switching, PendSV, SysTick, and critical sections.
+- `docs/api.md` summarizes the current RTOS API surface.
 
 ## RTOS milestones
 
@@ -135,7 +136,8 @@ state, and HardFault state.
 31. Add task notifications. Done.
 32. Add deferred interrupt work. Done.
 33. Add trace ring buffer. Done.
-34. Add kernel API cleanup docs.
+34. Add kernel API cleanup docs. Done.
+35. Final validation and demo polish.
 
 ## Typical edit loop
 
