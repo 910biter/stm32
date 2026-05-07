@@ -6,6 +6,7 @@ import sys
 
 SNAPSHOT_WORDS = 14
 OBJECT_SNAPSHOT_WORDS = 3
+TRACE_ENTRY_WORDS = 4
 
 
 def load_symbols(elf_path):
@@ -47,6 +48,7 @@ def main():
     symbols = load_symbols(sys.argv[1])
     max_tasks = load_config_define(sys.argv[2], "RTOS_MAX_TASKS")
     max_objects = load_config_define(sys.argv[2], "RTOS_MAX_OBJECTS")
+    trace_length = load_config_define(sys.argv[2], "RTOS_TRACE_LENGTH")
 
     counter_names = [
         "app_task1_count",
@@ -85,6 +87,8 @@ def main():
     emit_mem("kernel_state", symbol(symbols, "critical_nesting"), 2)
     emit_mem("scheduler_state", symbol(symbols, "rtos_scheduler_lock_count"), 2)
     emit_mem("work_state", symbol(symbols, "rtos_work_pending_items"), 2)
+    emit_mem("trace_state", symbol(symbols, "rtos_trace_write_index"), 3)
+    emit_mem("trace_entries", symbol(symbols, "rtos_trace_entries"), trace_length * TRACE_ENTRY_WORDS)
     emit_mem("fault_info", symbol(symbols, "rtos_fault_info"), 17)
 
     print('echo [format "task counters: produced=%u consumed=%u boost_count=%u timeout_count=%u timer_count=%u event_count=%u pool_count=%u exit_count=%u reuse_count=%u sched_lock_count=%u isr_sem_count=%u idle_hook_count=%u notify_count=%u deferred_count=%u queue_count=%u timeout_sem_count=%u event_flags=0x%08x pool_free=%u mutex_owner=0x%08x mutex_lock_count=%u tick=%u critical_nesting=%u saved_primask=%u scheduler_lock=%u scheduler_pending=%u work_pending=%u work_drops=%u snapshot_count=%u" $counters(0) $counters(1) $counters(2) $counters(3) $counters(4) $counters(5) $counters(6) $counters(7) $counters(8) $counters(9) $counters(10) $counters(11) $counters(12) $counters(13) $queue_state(2) $sem_state(0) $event_state(0) $pool_state(4) $mutex_state(0) $mutex_state(1) $tick_state(0) $kernel_state(0) $kernel_state(1) $scheduler_state(0) $scheduler_state(1) $work_state(0) $work_state(1) $debug_count(0)]')
@@ -95,6 +99,11 @@ def main():
         print(f'echo [format "task{task_index}: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d guard=%u switches=%u run_ticks=%u" {args}]')
 
     print('echo [format "cpu: total=%u idle=%u active=%u idle_permille=%u active_permille=%u" $cpu_usage(0) $cpu_usage(1) $cpu_usage(2) $cpu_usage(3) $cpu_usage(4)]')
+    print('echo [format "trace: write=%u count=%u total=%u" $trace_state(0) $trace_state(1) $trace_state(2)]')
+    for trace_index in range(trace_length):
+        base = trace_index * TRACE_ENTRY_WORDS
+        args = " ".join(f"$trace_entries({base + field})" for field in range(TRACE_ENTRY_WORDS))
+        print(f'echo [format "trace{trace_index}: tick=%u event=%u arg0=0x%08x arg1=0x%08x" {args}]')
     print('echo [format "object_count=%u" $object_count(0)]')
     for object_index in range(max_objects):
         base = object_index * OBJECT_SNAPSHOT_WORDS

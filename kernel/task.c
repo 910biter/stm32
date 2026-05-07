@@ -305,6 +305,7 @@ static int notify_common(rtos_task_t *task, uint32_t value)
     rtos_enter_critical();
     task->notify_value |= value;
     task->notify_pending = 1;
+    rtos_trace_record(RTOS_TRACE_NOTIFY, (uint32_t)task, value);
 
     if ((task->state == RTOS_TASK_BLOCKED) &&
         (task->wait_type == RTOS_WAIT_NOTIFICATION) &&

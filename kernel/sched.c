@@ -123,4 +123,7 @@ void rtos_schedule_next(void)
     best_task->state = RTOS_TASK_RUNNING;
     best_task->switch_count++;
     rtos_current_task = best_task;
+    if (best_task != old_task) {
+        rtos_trace_record(RTOS_TRACE_SWITCH, (uint32_t)old_task, (uint32_t)best_task);
+    }
 }

@@ -9,5 +9,6 @@
 #define RTOS_TICK_HZ            1000U
 #define RTOS_MAX_OBJECTS        16U
 #define RTOS_WORK_QUEUE_LENGTH  4U
+#define RTOS_TRACE_LENGTH       32U
 
 #endif

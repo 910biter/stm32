@@ -64,7 +64,8 @@ for the NUCLEO-F446RE board.
 31. Add CPU usage snapshots. Done.
 32. Add task notifications. Done.
 33. Add deferred interrupt work. Done.
-34. Add trace ring buffer.
+34. Add trace ring buffer. Done.
+35. Add kernel API cleanup docs.
 
 ## Cortex-M context switch model
 
@@ -246,3 +247,9 @@ task. ISRs can call `rtos_work_submit_isr()` to enqueue a callback, then return
 quickly. The worker task consumes pending work in Thread mode, making it the
 right place for follow-up code that is too expensive or too stateful for an
 interrupt handler.
+
+The trace ring buffer records compact `{tick, event, arg0, arg1}` entries in
+SRAM. It currently captures scheduler switches, task notifications, deferred
+work submissions, and deferred work execution. OpenOCD reads the ring alongside
+the task and object snapshots, giving a small flight recorder without UART or
+semihosting.

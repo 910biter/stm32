@@ -134,7 +134,8 @@ state, and HardFault state.
 30. Add CPU usage snapshots. Done.
 31. Add task notifications. Done.
 32. Add deferred interrupt work. Done.
-33. Add trace ring buffer.
+33. Add trace ring buffer. Done.
+34. Add kernel API cleanup docs.
 
 ## Typical edit loop
 

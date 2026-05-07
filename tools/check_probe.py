@@ -6,6 +6,7 @@ import sys
 PAIR_RE = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)=(-?0x[0-9a-fA-F]+|-?\d+)")
 TASK_RE = re.compile(r"^task(\d+):\s+(.*)$")
 OBJECT_RE = re.compile(r"^object(\d+):\s+(.*)$")
+TRACE_RE = re.compile(r"^trace(\d+):\s+(.*)$")
 
 
 def parse_int(value):
@@ -24,6 +25,8 @@ def load_probe(path):
     object_count = None
     objects = {}
     cpu_usage = None
+    trace_state = None
+    traces = {}
 
     with open(path, "r", encoding="utf-8", errors="replace") as log:
         for raw_line in log:
@@ -53,11 +56,20 @@ def load_probe(path):
                 cpu_usage = parse_pairs(line)
                 continue
 
+            if line.startswith("trace:"):
+                trace_state = parse_pairs(line)
+                continue
+
+            trace_match = TRACE_RE.match(line)
+            if trace_match:
+                traces[int(trace_match.group(1))] = parse_pairs(trace_match.group(2))
+                continue
+
             object_match = OBJECT_RE.match(line)
             if object_match:
                 objects[int(object_match.group(1))] = parse_pairs(object_match.group(2))
 
-    return counters, tasks, assertion, fault, object_count, objects, cpu_usage
+    return counters, tasks, assertion, fault, object_count, objects, cpu_usage, trace_state, traces
 
 
 def require(errors, condition, message):
@@ -65,7 +77,7 @@ def require(errors, condition, message):
         errors.append(message)
 
 
-def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_usage):
+def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_usage, trace_state, traces):
     errors = []
 
     require(errors, counters is not None, "missing task counters line")
@@ -74,6 +86,7 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_us
     require(errors, bool(tasks), "missing task snapshot lines")
     require(errors, object_count is not None, "missing object count line")
     require(errors, cpu_usage is not None, "missing CPU usage line")
+    require(errors, trace_state is not None, "missing trace line")
 
     if counters is not None:
         require(errors, counters.get("produced", 0) >= 5, "producer did not run enough times")
@@ -144,6 +157,17 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_us
         require(errors, cpu_usage.get("idle_permille", 0) >= 900,
                 "CPU usage expected this demo to be mostly idle")
 
+    if trace_state is not None:
+        live_events = [entry.get("event", 0) for entry in traces.values() if entry.get("event", 0) != 0]
+        live_types = set(live_events)
+        require(errors, trace_state.get("count", 0) >= 10, "trace ring did not capture enough entries")
+        require(errors, trace_state.get("total", 0) >= trace_state.get("count", 0), "trace total is lower than trace count")
+        require(errors, len(live_events) >= trace_state.get("count", 0), "trace entry count is lower than reported count")
+        require(errors, 1 in live_types, "trace ring did not capture scheduler switches")
+        require(errors, 2 in live_types, "trace ring did not capture task notifications")
+        require(errors, 3 in live_types, "trace ring did not capture work submissions")
+        require(errors, 4 in live_types, "trace ring did not capture work execution")
+
     return errors
 
 
@@ -151,8 +175,8 @@ def main():
     if len(sys.argv) != 2:
         raise SystemExit("usage: check_probe.py <probe.log>")
 
-    counters, tasks, assertion, fault, object_count, objects, cpu_usage = load_probe(sys.argv[1])
-    errors = check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_usage)
+    counters, tasks, assertion, fault, object_count, objects, cpu_usage, trace_state, traces = load_probe(sys.argv[1])
+    errors = check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_usage, trace_state, traces)
     if errors:
         print("probe checks failed:")
         for error in errors:

@@ -33,6 +33,7 @@ C_SOURCES := \
 	kernel/task.c \
 	kernel/tick.c \
 	kernel/timer.c \
+	kernel/trace.c \
 	kernel/work.c \
 	kernel/assert.c \
 	port/cortex_m4/port.c \

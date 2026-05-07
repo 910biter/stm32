@@ -45,6 +45,7 @@ static void work_task(void *arg)
             rtos_exit_critical();
 
             item.handler(item.arg);
+            rtos_trace_record(RTOS_TRACE_WORK_RUN, (uint32_t)item.handler, (uint32_t)item.arg);
         }
     }
 }
@@ -71,6 +72,7 @@ static int submit_common(rtos_work_handler_t handler, void *arg)
     work_queue[work_tail].arg = arg;
     work_tail = (work_tail + 1U) % RTOS_WORK_QUEUE_LENGTH;
     rtos_work_pending_items++;
+    rtos_trace_record(RTOS_TRACE_WORK_SUBMIT, (uint32_t)handler, (uint32_t)arg);
     rtos_exit_critical();
 
     if (work_task_handle != NULL) {
