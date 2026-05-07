@@ -10,14 +10,28 @@ static uint32_t align_word(uint32_t value)
 
 static void wait_push(rtos_mempool_t *pool, rtos_task_t *task)
 {
+    rtos_task_t *prev = NULL;
+    rtos_task_t *scan = pool->wait_head;
+
     task->wait_next = NULL;
 
-    if (pool->wait_tail == NULL) {
+    while ((scan != NULL) && (scan->priority >= task->priority)) {
+        prev = scan;
+        scan = scan->wait_next;
+    }
+
+    if (prev == NULL) {
+        task->wait_next = pool->wait_head;
         pool->wait_head = task;
-        pool->wait_tail = task;
+        if (pool->wait_tail == NULL) {
+            pool->wait_tail = task;
+        }
     } else {
-        pool->wait_tail->wait_next = task;
-        pool->wait_tail = task;
+        task->wait_next = scan;
+        prev->wait_next = task;
+        if (scan == NULL) {
+            pool->wait_tail = task;
+        }
     }
 }
 

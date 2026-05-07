@@ -4,14 +4,28 @@
 
 static void wait_push(rtos_task_t **head, rtos_task_t **tail, rtos_task_t *task)
 {
+    rtos_task_t *prev = NULL;
+    rtos_task_t *scan = *head;
+
     task->wait_next = NULL;
 
-    if (*tail == NULL) {
+    while ((scan != NULL) && (scan->priority >= task->priority)) {
+        prev = scan;
+        scan = scan->wait_next;
+    }
+
+    if (prev == NULL) {
+        task->wait_next = *head;
         *head = task;
-        *tail = task;
+        if (*tail == NULL) {
+            *tail = task;
+        }
     } else {
-        (*tail)->wait_next = task;
-        *tail = task;
+        task->wait_next = scan;
+        prev->wait_next = task;
+        if (scan == NULL) {
+            *tail = task;
+        }
     }
 }
 

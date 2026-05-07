@@ -53,7 +53,8 @@ for the NUCLEO-F446RE board.
 20. Add memory pools. Done.
 21. Add task lifecycle management. Done.
 22. Add task slot reuse. Done.
-23. Add priority-aware wait queues.
+23. Add priority-aware wait queues. Done.
+24. Add per-task statistics.
 
 ## Cortex-M context switch model
 
@@ -170,3 +171,9 @@ block and its stack once the fixed task table is full. Reused tasks stay in the
 same circular scheduler list, so creation only rebuilds the initial stack frame
 and marks the task ready again. This keeps allocation static while allowing
 short-lived tasks to be relaunched.
+
+Wait queues are priority-aware. Semaphores, queues, mutexes, event flags, and
+memory pools insert blocked tasks by effective priority, highest first. Tasks
+with equal priority keep FIFO order. This makes wakeups line up with the
+scheduler's priority model instead of allowing an older low-priority waiter to
+run ahead of a newer high-priority waiter.

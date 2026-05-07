@@ -22,16 +22,31 @@ int rtos_sem_wait(rtos_sem_t *sem)
 
 static void wait_push(rtos_sem_t *sem, rtos_task_t *task)
 {
+    rtos_task_t *prev = NULL;
+    rtos_task_t *scan = sem->wait_head;
+
     task->wait_next = NULL;
 
-    if (sem->wait_tail == NULL) {
+    while ((scan != NULL) && (scan->priority >= task->priority)) {
+        prev = scan;
+        scan = scan->wait_next;
+    }
+
+    if (prev == NULL) {
+        task->wait_next = sem->wait_head;
         sem->wait_head = task;
-        sem->wait_tail = task;
+        if (sem->wait_tail == NULL) {
+            sem->wait_tail = task;
+        }
     } else {
-        sem->wait_tail->wait_next = task;
-        sem->wait_tail = task;
+        task->wait_next = scan;
+        prev->wait_next = task;
+        if (scan == NULL) {
+            sem->wait_tail = task;
+        }
     }
 }
+
 
 static void wait_remove(rtos_sem_t *sem, rtos_task_t *task)
 {
