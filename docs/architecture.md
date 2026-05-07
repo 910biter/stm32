@@ -55,7 +55,8 @@ for the NUCLEO-F446RE board.
 22. Add task slot reuse. Done.
 23. Add priority-aware wait queues. Done.
 24. Add per-task statistics. Done.
-25. Add probe symbol generation.
+25. Add probe symbol generation. Done.
+26. Add automated probe checks.
 
 ## Cortex-M context switch model
 
@@ -183,3 +184,8 @@ Per-task statistics track how often each task is selected by the scheduler and
 how many SysTick intervals it has spent running. These counters live in the TCB
 and are exported through debug snapshots, giving a simple view of scheduler
 activity without needing trace hardware.
+
+The OpenOCD probe script is generated from the ELF symbol table. `make probe`
+builds the firmware, runs `tools/gen_probe.py`, and uses the generated script
+under `build/`. This removes the brittle hand-maintained SRAM addresses from
+the normal debug loop when `.bss` layout changes.

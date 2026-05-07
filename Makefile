@@ -6,6 +6,7 @@ OBJCOPY := arm-none-eabi-objcopy
 SIZE := arm-none-eabi-size
 GDB := arm-none-eabi-gdb
 OPENOCD := openocd
+PYTHON := python3
 
 CPU := -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 CFLAGS := $(CPU) -std=c11 -Wall -Wextra -Werror -O0 -g3 -ffunction-sections -fdata-sections
@@ -13,6 +14,7 @@ CFLAGS += -Iinclude -Iboard -Iport/cortex_m4
 ASFLAGS := $(CPU) -g3
 LDSCRIPT := ld/stm32f446re.ld
 LDFLAGS := $(CPU) -T $(LDSCRIPT) -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
+PROBE_SCRIPT := $(BUILD_DIR)/probe_counters.openocd
 
 C_SOURCES := \
 	app/main.c \
@@ -40,7 +42,7 @@ ASM_SOURCES := \
 OBJECTS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
 OBJECTS += $(ASM_SOURCES:%.S=$(BUILD_DIR)/%.o)
 
-.PHONY: all clean flash debug openocd probe
+.PHONY: all clean flash debug openocd probe probe-script
 
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
 
@@ -68,8 +70,13 @@ flash: all
 openocd:
 	$(OPENOCD) -f openocd.cfg
 
-probe:
-	$(OPENOCD) -f openocd.cfg -f tools/probe_counters.openocd
+$(PROBE_SCRIPT): $(BUILD_DIR)/$(TARGET).elf tools/gen_probe.py include/rtos_config.h | $(BUILD_DIR)
+	$(PYTHON) tools/gen_probe.py $(BUILD_DIR)/$(TARGET).elf include/rtos_config.h > $@
+
+probe-script: $(PROBE_SCRIPT)
+
+probe: $(PROBE_SCRIPT)
+	$(OPENOCD) -f openocd.cfg -f $(PROBE_SCRIPT)
 
 debug: all
 	$(GDB) $(BUILD_DIR)/$(TARGET).elf -ex "target extended-remote localhost:3333"
