@@ -3,6 +3,7 @@ reset run
 sleep 2000
 halt
 mem2array counters 32 0x20000000 4
-mem2array kernel_state 32 0x20000890 3
-echo [format "task counters: produced=%u consumed=%u sem_count=%u sem_max=%u tick=%u critical_nesting=%u saved_primask=%u" $counters(0) $counters(1) $counters(2) $counters(3) $kernel_state(0) $kernel_state(1) $kernel_state(2)]
+mem2array queue_state 32 0x20000008 5
+mem2array kernel_state 32 0x200008b4 3
+echo [format "task counters: produced=%u consumed=%u queue_capacity=%u queue_count=%u queue_head=%u queue_tail=%u tick=%u critical_nesting=%u saved_primask=%u" $counters(0) $counters(1) $queue_state(1) $queue_state(2) $queue_state(3) $queue_state(4) $kernel_state(0) $kernel_state(1) $kernel_state(2)]
 shutdown

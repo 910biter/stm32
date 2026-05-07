@@ -38,7 +38,8 @@ for the NUCLEO-F446RE board.
 5. Add `rtos_sleep()` so tasks block instead of spinning. Done.
 6. Add nested critical sections. Done.
 7. Add counting semaphores. Done.
-8. Add queues, priority scheduling, mutexes, and debug task listing.
+8. Add fixed-size message queues. Done.
+9. Add priority scheduling, mutexes, and debug task listing.
 
 ## Cortex-M context switch model
 
@@ -72,3 +73,8 @@ Counting semaphores are exposed as `rtos_sem_t`. A wait with no available count
 blocks the current task and links it onto the semaphore wait FIFO. Posting wakes
 the oldest waiting task, or increments the count up to `max_count` when no task
 is waiting.
+
+Queues are exposed as `rtos_queue_t` and currently carry `uint32_t` messages.
+Receiving from an empty queue blocks on a receive wait FIFO. Sending to a full
+queue blocks on a send wait FIFO. Send and receive operations wake the oldest
+opposite-side waiter when progress becomes possible.

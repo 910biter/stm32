@@ -68,9 +68,9 @@ make probe
 ```
 
 The probe script lets the firmware run for two seconds, halts the MCU, and
-prints the producer/consumer task counters, semaphore state, and RTOS tick
-count from SRAM. The producer posts a semaphore every 250 ms, and the consumer
-blocks on that semaphore before toggling LD2.
+prints the producer/consumer task counters, queue state, and RTOS tick count
+from SRAM. The producer sends a queue message every 250 ms, and the consumer
+blocks on that queue before toggling LD2.
 
 ## Bare-metal structure
 
@@ -91,7 +91,8 @@ blocks on that semaphore before toggling LD2.
 4. Add `rtos_sleep()` and blocked task wakeup. Done.
 5. Add nested critical sections. Done.
 6. Add counting semaphores. Done.
-7. Add queues, priority scheduling, mutexes, and debug task listing.
+7. Add fixed-size message queues. Done.
+8. Add priority scheduling, mutexes, and debug task listing.
 
 ## Typical edit loop
 
