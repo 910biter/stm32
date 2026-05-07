@@ -1,8 +1,8 @@
 #include "board.h"
 #include "rtos.h"
 
-static volatile uint32_t task1_count;
-static volatile uint32_t task2_count;
+volatile uint32_t app_task1_count;
+volatile uint32_t app_task2_count;
 
 static void led_task(void *arg)
 {
@@ -11,8 +11,7 @@ static void led_task(void *arg)
     while (1) {
         board_led_on();
         board_delay(300000UL);
-        task1_count++;
-        rtos_yield();
+        app_task1_count++;
     }
 }
 
@@ -23,8 +22,7 @@ static void idle_task(void *arg)
     while (1) {
         board_led_off();
         board_delay(300000UL);
-        task2_count++;
-        rtos_yield();
+        app_task2_count++;
     }
 }
 

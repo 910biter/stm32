@@ -1,6 +1,7 @@
 #include "rtos.h"
 
 #include "port.h"
+#include "rtos_config.h"
 
 void rtos_start(void)
 {
@@ -10,6 +11,7 @@ void rtos_start(void)
 
     rtos_current_task->state = RTOS_TASK_RUNNING;
     port_init_scheduler();
+    port_setup_systick(RTOS_CPU_HZ, RTOS_TICK_HZ);
     port_start_first_task();
 
     while (1) {

@@ -68,7 +68,9 @@ make probe
 ```
 
 The probe script lets the firmware run for two seconds, halts the MCU, and
-prints the two demo task counters from SRAM.
+prints the two demo task counters from SRAM. The current demo tasks do not call
+`rtos_yield()` in their loop, so both counters increasing means SysTick
+preemption is working.
 
 ## Bare-metal structure
 
@@ -85,7 +87,7 @@ prints the two demo task counters from SRAM.
 
 1. Keep blink working in the new project layout. Done.
 2. Add cooperative task switching with independent task stacks and PendSV. Done.
-3. Add SysTick-based preemption.
+3. Add SysTick-based preemption. Done.
 4. Add `rtos_sleep()` and blocked task wakeup.
 5. Add critical sections, then semaphores, mutexes, and queues.
 

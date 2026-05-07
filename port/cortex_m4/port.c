@@ -1,14 +1,31 @@
 #include "port.h"
 
-#include <stdint.h>
+#include "rtos.h"
 
 #define SCB_ICSR        (*(volatile uint32_t *)0xE000ED04UL)
 #define SCB_SHPR3       (*(volatile uint32_t *)0xE000ED20UL)
+#define SYST_CSR        (*(volatile uint32_t *)0xE000E010UL)
+#define SYST_RVR        (*(volatile uint32_t *)0xE000E014UL)
+#define SYST_CVR        (*(volatile uint32_t *)0xE000E018UL)
+
 #define SCB_ICSR_PENDSVSET  (1UL << 28)
+#define SYST_CSR_ENABLE     (1UL << 0)
+#define SYST_CSR_TICKINT    (1UL << 1)
+#define SYST_CSR_CLKSOURCE  (1UL << 2)
 
 void port_init_scheduler(void)
 {
-    SCB_SHPR3 |= 0xFFUL << 16;
+    SCB_SHPR3 |= (0xFFUL << 16) | (0xFEUL << 24);
+}
+
+void port_setup_systick(uint32_t cpu_hz, uint32_t tick_hz)
+{
+    uint32_t reload = (cpu_hz / tick_hz) - 1UL;
+
+    SYST_CSR = 0;
+    SYST_RVR = reload;
+    SYST_CVR = 0;
+    SYST_CSR = SYST_CSR_CLKSOURCE | SYST_CSR_TICKINT | SYST_CSR_ENABLE;
 }
 
 void port_trigger_pendsv(void)
@@ -26,4 +43,9 @@ void port_enter_critical(void)
 void port_exit_critical(void)
 {
     __asm volatile ("cpsie i" ::: "memory");
+}
+
+void SysTick_Handler(void)
+{
+    rtos_tick_handler();
 }

@@ -34,7 +34,7 @@ for the NUCLEO-F446RE board.
 1. Keep the existing blink application building in the new layout. Done.
 2. Add static task creation and per-task stacks. Done.
 3. Implement cooperative `rtos_yield()` through PendSV. Done.
-4. Add SysTick and round-robin preemption.
+4. Add SysTick and round-robin preemption. Done.
 5. Add `rtos_sleep()` so tasks block instead of spinning.
 6. Add critical sections and basic synchronization primitives.
 
@@ -50,3 +50,8 @@ switch at the lowest interrupt priority.
 The first cooperative implementation starts the initial task directly from
 Thread mode using PSP, then uses PendSV for subsequent task switches. A later
 milestone can replace that bootstrap with an SVC-based start path.
+
+The first preemptive implementation configures SysTick from the default
+16 MHz reset clock and requests PendSV from `SysTick_Handler`. The demo tasks
+busy-loop without calling `rtos_yield()`, so round-robin progress now depends
+on the tick interrupt.
