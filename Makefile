@@ -18,6 +18,7 @@ C_SOURCES := \
 	app/main.c \
 	board/board.c \
 	kernel/critical.c \
+	kernel/debug.c \
 	kernel/list.c \
 	kernel/mutex.c \
 	kernel/queue.c \

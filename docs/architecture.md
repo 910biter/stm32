@@ -42,7 +42,8 @@ for the NUCLEO-F446RE board.
 9. Add priority scheduling with same-priority round-robin. Done.
 10. Add recursive mutexes. Done.
 11. Add mutex priority inheritance. Done.
-12. Add debug task listing.
+12. Add debug task listing. Done.
+13. Add an SVC-based scheduler start path.
 
 ## Cortex-M context switch model
 
@@ -95,3 +96,9 @@ when a higher-priority task blocks on the mutex. The owner returns to its base
 priority when it releases the outermost recursive lock. This first version is
 intentionally simple and assumes a task is not simultaneously inheriting through
 multiple mutexes.
+
+Debug snapshots expose the current task table without needing a C library or
+UART. Each task carries an optional name pointer, and each stack is filled with
+`0xA5A5A5A5` before the initial exception frame is built. The debug module scans
+for the first overwritten word to estimate stack use, then publishes a fixed
+array of snapshots that OpenOCD can read from SRAM.

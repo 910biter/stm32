@@ -68,12 +68,15 @@ make probe
 ```
 
 The probe script lets the firmware run for two seconds, halts the MCU, and
-prints the producer/consumer task counters, queue state, and RTOS tick count
+prints the producer/consumer task counters, queue state, RTOS tick count, and
+task debug snapshots
 from SRAM. The producer sends a queue message every 250 ms, and the consumer
 blocks on that queue before toggling LD2. The consumer runs at a higher
 priority than the producer, so queue send should promptly wake it. The demo
 also protects the producer/consumer handoff with a recursive mutex and counts
-producer priority inheritance events.
+producer priority inheritance events. The debug snapshots include each task's
+TCB pointer, PSP, stack base, stack use estimate, delay, state, and effective
+priority.
 
 ## Bare-metal structure
 
@@ -83,7 +86,7 @@ producer priority inheritance events.
 - `startup/startup_stm32f4.c` defines the vector table and `Reset_Handler`.
 - `Reset_Handler` copies `.data` from flash to RAM, clears `.bss`, then calls `main`.
 - `ld/stm32f446re.ld` places the vector table and code at `0x08000000`, and RAM at `0x20000000`.
-- `kernel/` is reserved for task, scheduler, tick, and list code.
+- `kernel/` owns task, scheduler, tick, sync, and debug snapshot code.
 - `port/cortex_m4/` is reserved for Cortex-M4 context switching, PendSV, SysTick, and critical sections.
 
 ## RTOS milestones
@@ -98,7 +101,8 @@ producer priority inheritance events.
 8. Add priority scheduling with same-priority round-robin. Done.
 9. Add recursive mutexes. Done.
 10. Add mutex priority inheritance. Done.
-11. Add debug task listing.
+11. Add debug task listing. Done.
+12. Add an SVC-based scheduler start path.
 
 ## Typical edit loop
 

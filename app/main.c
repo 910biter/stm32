@@ -53,8 +53,8 @@ int main(void)
 
     (void)rtos_queue_init(&led_queue, led_queue_storage, 4);
     (void)rtos_mutex_init(&app_mutex);
-    (void)rtos_task_create_with_priority(producer_task, 0, 1);
-    (void)rtos_task_create_with_priority(consumer_task, 0, 2);
+    (void)rtos_task_create_named(producer_task, 0, 1, "producer");
+    (void)rtos_task_create_named(consumer_task, 0, 2, "consumer");
     rtos_start();
 
     while (1) {

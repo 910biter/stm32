@@ -21,11 +21,16 @@ typedef struct rtos_task {
     rtos_task_state_t state;
     struct rtos_task *next;
     struct rtos_task *wait_next;
+    const char *name;
 } rtos_task_t;
 
 extern rtos_task_t *rtos_current_task;
 
+int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority, const char *name);
 int rtos_create_idle_task(void);
+uint32_t rtos_task_count(void);
+rtos_task_t *rtos_task_at(uint32_t index);
+uint32_t rtos_task_stack_used_words(const rtos_task_t *task);
 void rtos_schedule_next(void);
 void rtos_task_tick(void);
 void rtos_task_exit(void);

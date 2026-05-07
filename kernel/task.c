@@ -5,6 +5,7 @@
 
 #define INITIAL_XPSR        0x01000000UL
 #define EXC_RETURN_THREAD_PSP 0xFFFFFFFDUL
+#define STACK_FILL_PATTERN  0xA5A5A5A5UL
 
 static rtos_task_t tasks[RTOS_MAX_TASKS];
 static uint32_t task_stacks[RTOS_MAX_TASKS][RTOS_TASK_STACK_WORDS];
@@ -26,7 +27,7 @@ static uint32_t *align_stack(uint32_t *sp)
     return (uint32_t *)((uintptr_t)sp & ~((uintptr_t)0x7U));
 }
 
-int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t priority)
+int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority, const char *name)
 {
     if ((entry == NULL) || (task_count >= RTOS_MAX_TASKS)) {
         return -1;
@@ -35,6 +36,10 @@ int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t 
     rtos_task_t *task = &tasks[task_count];
     uint32_t *stack = task_stacks[task_count];
     uint32_t *sp = align_stack(stack + RTOS_TASK_STACK_WORDS);
+
+    for (uint32_t i = 0; i < RTOS_TASK_STACK_WORDS; ++i) {
+        stack[i] = STACK_FILL_PATTERN;
+    }
 
     *--sp = INITIAL_XPSR;
     *--sp = ((uint32_t)entry) | 1UL;
@@ -54,6 +59,7 @@ int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t 
     *--sp = 0x05050505UL;
     *--sp = 0x04040404UL;
 
+    task->name = name;
     task->sp = sp;
     task->stack_base = stack;
     task->stack_words = RTOS_TASK_STACK_WORDS;
@@ -75,6 +81,11 @@ int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t 
     return 0;
 }
 
+int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t priority)
+{
+    return rtos_task_create_named(entry, arg, priority, NULL);
+}
+
 int rtos_task_create(rtos_task_entry_t entry, void *arg)
 {
     return rtos_task_create_with_priority(entry, arg, RTOS_DEFAULT_PRIORITY);
@@ -92,7 +103,36 @@ uint32_t rtos_current_base_priority(void)
 
 int rtos_create_idle_task(void)
 {
-    return rtos_task_create_with_priority(idle_task, NULL, RTOS_IDLE_PRIORITY);
+    return rtos_task_create_named(idle_task, NULL, RTOS_IDLE_PRIORITY, "idle");
+}
+
+uint32_t rtos_task_count(void)
+{
+    return task_count;
+}
+
+rtos_task_t *rtos_task_at(uint32_t index)
+{
+    if (index >= task_count) {
+        return NULL;
+    }
+
+    return &tasks[index];
+}
+
+uint32_t rtos_task_stack_used_words(const rtos_task_t *task)
+{
+    uint32_t unused = 0;
+
+    if ((task == NULL) || (task->stack_base == NULL)) {
+        return 0;
+    }
+
+    while ((unused < task->stack_words) && (task->stack_base[unused] == STACK_FILL_PATTERN)) {
+        unused++;
+    }
+
+    return task->stack_words - unused;
 }
 
 void rtos_task_tick(void)

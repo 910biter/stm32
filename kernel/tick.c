@@ -8,6 +8,7 @@ void rtos_tick_handler(void)
 {
     tick_count++;
     rtos_task_tick();
+    rtos_debug_update();
     port_trigger_pendsv();
 }
 
