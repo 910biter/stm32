@@ -16,6 +16,7 @@ typedef struct rtos_task {
     uint32_t *stack_base;
     uint32_t stack_words;
     uint32_t delay_ticks;
+    uint32_t priority;
     rtos_task_state_t state;
     struct rtos_task *next;
     struct rtos_task *wait_next;

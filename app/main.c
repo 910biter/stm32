@@ -43,8 +43,8 @@ int main(void)
     board_init();
 
     (void)rtos_queue_init(&led_queue, led_queue_storage, 4);
-    (void)rtos_task_create(producer_task, 0);
-    (void)rtos_task_create(consumer_task, 0);
+    (void)rtos_task_create_with_priority(producer_task, 0, 1);
+    (void)rtos_task_create_with_priority(consumer_task, 0, 2);
     rtos_start();
 
     while (1) {

@@ -70,7 +70,8 @@ make probe
 The probe script lets the firmware run for two seconds, halts the MCU, and
 prints the producer/consumer task counters, queue state, and RTOS tick count
 from SRAM. The producer sends a queue message every 250 ms, and the consumer
-blocks on that queue before toggling LD2.
+blocks on that queue before toggling LD2. The consumer runs at a higher
+priority than the producer, so queue send should promptly wake it.
 
 ## Bare-metal structure
 
@@ -92,7 +93,8 @@ blocks on that queue before toggling LD2.
 5. Add nested critical sections. Done.
 6. Add counting semaphores. Done.
 7. Add fixed-size message queues. Done.
-8. Add priority scheduling, mutexes, and debug task listing.
+8. Add priority scheduling with same-priority round-robin. Done.
+9. Add mutexes and debug task listing.
 
 ## Typical edit loop
 

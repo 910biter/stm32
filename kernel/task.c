@@ -26,7 +26,7 @@ static uint32_t *align_stack(uint32_t *sp)
     return (uint32_t *)((uintptr_t)sp & ~((uintptr_t)0x7U));
 }
 
-int rtos_task_create(rtos_task_entry_t entry, void *arg)
+int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t priority)
 {
     if ((entry == NULL) || (task_count >= RTOS_MAX_TASKS)) {
         return -1;
@@ -58,6 +58,7 @@ int rtos_task_create(rtos_task_entry_t entry, void *arg)
     task->stack_base = stack;
     task->stack_words = RTOS_TASK_STACK_WORDS;
     task->delay_ticks = 0;
+    task->priority = priority;
     task->state = RTOS_TASK_READY;
     task->wait_next = NULL;
 
@@ -73,9 +74,14 @@ int rtos_task_create(rtos_task_entry_t entry, void *arg)
     return 0;
 }
 
+int rtos_task_create(rtos_task_entry_t entry, void *arg)
+{
+    return rtos_task_create_with_priority(entry, arg, RTOS_DEFAULT_PRIORITY);
+}
+
 int rtos_create_idle_task(void)
 {
-    return rtos_task_create(idle_task, NULL);
+    return rtos_task_create_with_priority(idle_task, NULL, RTOS_IDLE_PRIORITY);
 }
 
 void rtos_task_tick(void)

@@ -39,7 +39,8 @@ for the NUCLEO-F446RE board.
 6. Add nested critical sections. Done.
 7. Add counting semaphores. Done.
 8. Add fixed-size message queues. Done.
-9. Add priority scheduling, mutexes, and debug task listing.
+9. Add priority scheduling with same-priority round-robin. Done.
+10. Add mutexes and debug task listing.
 
 ## Cortex-M context switch model
 
@@ -78,3 +79,7 @@ Queues are exposed as `rtos_queue_t` and currently carry `uint32_t` messages.
 Receiving from an empty queue blocks on a receive wait FIFO. Sending to a full
 queue blocks on a send wait FIFO. Send and receive operations wake the oldest
 opposite-side waiter when progress becomes possible.
+
+Tasks have integer priorities where larger values run first. The scheduler
+scans from the current task's successor and chooses the highest-priority ready
+task, preserving round-robin behavior among tasks with equal priority.

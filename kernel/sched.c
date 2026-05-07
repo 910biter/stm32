@@ -52,16 +52,23 @@ void rtos_sleep(uint32_t ms)
 void rtos_schedule_next(void)
 {
     rtos_task_t *old_task = rtos_current_task;
-    rtos_task_t *next_task = old_task->next;
+    rtos_task_t *scan_task = old_task->next;
+    rtos_task_t *best_task = 0;
 
     if (old_task->state == RTOS_TASK_RUNNING) {
         old_task->state = RTOS_TASK_READY;
     }
 
-    while (next_task->state != RTOS_TASK_READY) {
-        next_task = next_task->next;
-    }
+    do {
+        if (scan_task->state == RTOS_TASK_READY) {
+            if ((best_task == 0) || (scan_task->priority > best_task->priority)) {
+                best_task = scan_task;
+            }
+        }
 
-    next_task->state = RTOS_TASK_RUNNING;
-    rtos_current_task = next_task;
+        scan_task = scan_task->next;
+    } while (scan_task != old_task->next);
+
+    best_task->state = RTOS_TASK_RUNNING;
+    rtos_current_task = best_task;
 }
