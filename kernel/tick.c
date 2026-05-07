@@ -11,6 +11,7 @@ void rtos_tick_handler(void)
 {
     tick_count++;
     rtos_task_tick();
+    rtos_timer_tick();
     rtos_check_stack_guards();
     if (debug_update_ticks == 0U) {
         rtos_debug_update();

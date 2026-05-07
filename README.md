@@ -108,7 +108,8 @@ delay, state, wait result, and effective priority.
 14. Add timeouts for blocking primitives. Done.
 15. Add runtime assertions. Done.
 16. Add stack overflow checks. Done.
-17. Add software timers.
+17. Add software timers. Done.
+18. Add event flags.
 
 ## Typical edit loop
 

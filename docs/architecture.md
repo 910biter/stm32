@@ -48,7 +48,8 @@ for the NUCLEO-F446RE board.
 15. Add timeouts for blocking primitives. Done.
 16. Add runtime assertions. Done.
 17. Add stack overflow checks. Done.
-18. Add software timers.
+18. Add software timers. Done.
+19. Add event flags.
 
 ## Cortex-M context switch model
 
@@ -137,3 +138,9 @@ guard trips `RTOS_ASSERT()` and leaves the failed expression in SRAM for
 OpenOCD. Debug snapshots are refreshed at a lower rate than the scheduler tick
 because stack-watermark scans are useful for inspection but too heavy to run in
 every 1 kHz interrupt.
+
+Software timers are lightweight `rtos_timer_t` objects linked into a kernel
+timer list. SysTick decrements active timers and invokes the callback when the
+period expires. Callbacks run in interrupt context, so they must stay short and
+must not call blocking RTOS APIs. The demo uses a 500 ms periodic timer that
+increments a SRAM counter.
