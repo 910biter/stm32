@@ -43,7 +43,8 @@ for the NUCLEO-F446RE board.
 10. Add recursive mutexes. Done.
 11. Add mutex priority inheritance. Done.
 12. Add debug task listing. Done.
-13. Add an SVC-based scheduler start path.
+13. Add an SVC-based scheduler start path. Done.
+14. Add basic fault diagnostics.
 
 ## Cortex-M context switch model
 
@@ -54,9 +55,12 @@ current task stack pointer.
 SysTick should request scheduling, and PendSV should perform the context
 switch at the lowest interrupt priority.
 
-The first cooperative implementation starts the initial task directly from
-Thread mode using PSP, then uses PendSV for subsequent task switches. A later
-milestone can replace that bootstrap with an SVC-based start path.
+The first cooperative implementation started the initial task directly from
+Thread mode using PSP, then used PendSV for subsequent task switches. The
+current startup path requests SVC from `rtos_start()`. `SVC_Handler` restores
+the first task's callee-saved registers, points PSP at the synthetic exception
+frame, selects PSP for Thread mode, and returns through `0xFFFFFFFD` so the
+Cortex-M exception-return hardware enters the first task.
 
 The first preemptive implementation configures SysTick from the default
 16 MHz reset clock and requests PendSV from `SysTick_Handler`. The demo tasks

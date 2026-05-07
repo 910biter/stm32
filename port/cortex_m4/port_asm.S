@@ -7,20 +7,22 @@
     .global port_start_first_task
     .type port_start_first_task, %function
 port_start_first_task:
+    svc #0
+    bx lr
+
+    .global SVC_Handler
+    .type SVC_Handler, %function
+SVC_Handler:
     ldr r0, =rtos_current_task
     ldr r0, [r0]
     ldr r0, [r0]
     ldmia r0!, {r4-r11}
-    add r1, r0, #32
-    msr psp, r1
-    movs r1, #2
-    msr control, r1
+    msr psp, r0
+    movs r0, #2
+    msr control, r0
     isb
-    ldr r1, [r0, #20]
-    mov lr, r1
-    ldr r1, [r0, #24]
-    ldr r0, [r0]
-    bx r1
+    ldr lr, =0xFFFFFFFD
+    bx lr
 
     .global PendSV_Handler
     .type PendSV_Handler, %function
