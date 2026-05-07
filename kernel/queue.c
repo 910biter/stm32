@@ -108,6 +108,11 @@ int rtos_queue_send(rtos_queue_t *queue, uint32_t value)
     return rtos_queue_send_timeout(queue, value, RTOS_TIMEOUT_FOREVER);
 }
 
+int rtos_queue_send_isr(rtos_queue_t *queue, uint32_t value)
+{
+    return rtos_queue_send_timeout(queue, value, 0);
+}
+
 int rtos_queue_send_timeout(rtos_queue_t *queue, uint32_t value, uint32_t timeout_ms)
 {
     rtos_task_t *task;

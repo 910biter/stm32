@@ -136,7 +136,7 @@ int rtos_sem_wait_timeout(rtos_sem_t *sem, uint32_t timeout_ms)
     return RTOS_OK;
 }
 
-int rtos_sem_post(rtos_sem_t *sem)
+static int post_common(rtos_sem_t *sem)
 {
     rtos_task_t *task;
     int should_yield = 0;
@@ -167,4 +167,14 @@ int rtos_sem_post(rtos_sem_t *sem)
     }
 
     return result;
+}
+
+int rtos_sem_post(rtos_sem_t *sem)
+{
+    return post_common(sem);
+}
+
+int rtos_sem_post_isr(rtos_sem_t *sem)
+{
+    return post_common(sem);
 }

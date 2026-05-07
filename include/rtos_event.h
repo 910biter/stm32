@@ -13,6 +13,7 @@ typedef struct rtos_event_flags {
 
 int rtos_event_flags_init(rtos_event_flags_t *events);
 int rtos_event_flags_set(rtos_event_flags_t *events, uint32_t flags);
+int rtos_event_flags_set_isr(rtos_event_flags_t *events, uint32_t flags);
 int rtos_event_flags_clear(rtos_event_flags_t *events, uint32_t flags);
 int rtos_event_flags_wait(rtos_event_flags_t *events,
                           uint32_t flags,

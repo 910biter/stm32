@@ -62,6 +62,11 @@ uint32_t rtos_sched_lock_depth(void)
     return rtos_scheduler_lock_count;
 }
 
+uint32_t rtos_in_isr(void)
+{
+    return port_in_isr();
+}
+
 void rtos_sleep(uint32_t ms)
 {
     uint32_t ticks;

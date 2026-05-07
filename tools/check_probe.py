@@ -81,6 +81,7 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects):
         require(errors, counters.get("exit_count") == 1, "one-shot task did not stop exactly once")
         require(errors, counters.get("reuse_count") == 1, "stopped task slot was not reused exactly once")
         require(errors, counters.get("sched_lock_count", 0) >= 2, "scheduler lock demo did not run enough times")
+        require(errors, counters.get("isr_sem_count", 0) >= 2, "ISR semaphore wake demo did not run enough times")
         require(errors, counters.get("queue_count", 0) <= 1, "queue retained more than one pending message")
         require(errors, counters.get("timeout_sem_count") == 0, "timeout semaphore unexpectedly has tokens")
         require(errors, (counters.get("event_flags", 0) & ~0x1) == 0, "event flags contain unexpected bits")
@@ -116,7 +117,7 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects):
         live_objects = [obj for obj in objects.values() if obj.get("type", 0) != 0]
         live_types = {obj.get("type") for obj in live_objects}
         require(errors, object_count == len(live_objects), "object count does not match non-empty object lines")
-        require(errors, object_count >= 6, "expected at least six registered kernel objects")
+        require(errors, object_count >= 7, "expected at least seven registered kernel objects")
         require(errors, {1, 2, 3, 4, 5, 6}.issubset(live_types), "not all demo object types were registered")
         for index, obj in sorted(objects.items()):
             if obj.get("type", 0) == 0:

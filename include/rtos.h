@@ -24,6 +24,7 @@ void rtos_sleep(uint32_t ms);
 void rtos_sched_lock(void);
 void rtos_sched_unlock(void);
 uint32_t rtos_sched_lock_depth(void);
+uint32_t rtos_in_isr(void);
 void rtos_enter_critical(void);
 void rtos_exit_critical(void);
 void rtos_tick_handler(void);

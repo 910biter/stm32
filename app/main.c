@@ -11,11 +11,13 @@ volatile uint32_t app_pool_count;
 volatile uint32_t app_exit_count;
 volatile uint32_t app_reuse_count;
 volatile uint32_t app_sched_lock_count;
+volatile uint32_t app_isr_sem_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
 static rtos_mutex_t app_mutex;
 static rtos_sem_t timeout_sem;
+static rtos_sem_t isr_sem;
 static rtos_timer_t demo_timer;
 static rtos_event_flags_t demo_events;
 static rtos_mempool_t demo_pool;
@@ -79,6 +81,9 @@ static void timeout_task(void *arg)
             app_pool_count++;
             (void)rtos_mempool_free(&demo_pool, block);
         }
+        if (rtos_sem_wait_timeout(&isr_sem, 0) == RTOS_OK) {
+            app_isr_sem_count++;
+        }
         if ((app_exit_count != 0U) && (reuse_created == 0U)) {
             if (rtos_task_create_named(one_shot_task, 0, 1, "reuse") == RTOS_OK) {
                 reuse_created = 1;
@@ -97,7 +102,10 @@ static void timer_callback(void *arg)
     (void)arg;
 
     app_timer_count++;
-    (void)rtos_event_flags_set(&demo_events, 0x1U);
+    if (rtos_in_isr() != 0U) {
+        (void)rtos_event_flags_set_isr(&demo_events, 0x1U);
+        (void)rtos_sem_post_isr(&isr_sem);
+    }
 }
 
 static void one_shot_task(void *arg)
@@ -118,12 +126,14 @@ int main(void)
     (void)rtos_queue_init(&led_queue, led_queue_storage, 4);
     (void)rtos_mutex_init(&app_mutex);
     (void)rtos_sem_init(&timeout_sem, 0, 1);
+    (void)rtos_sem_init(&isr_sem, 0, 1);
     (void)rtos_event_flags_init(&demo_events);
     (void)rtos_mempool_init(&demo_pool, demo_pool_storage, sizeof(demo_pool_storage[0]), 4);
     (void)rtos_timer_init(&demo_timer, 500, 1, timer_callback, 0);
     (void)rtos_object_set_name(&led_queue, "led_queue");
     (void)rtos_object_set_name(&app_mutex, "app_mutex");
     (void)rtos_object_set_name(&timeout_sem, "timeout_sem");
+    (void)rtos_object_set_name(&isr_sem, "isr_sem");
     (void)rtos_object_set_name(&demo_events, "demo_events");
     (void)rtos_object_set_name(&demo_pool, "demo_pool");
     (void)rtos_object_set_name(&demo_timer, "demo_timer");

@@ -86,7 +86,7 @@ int rtos_event_flags_init(rtos_event_flags_t *events)
     return RTOS_OK;
 }
 
-int rtos_event_flags_set(rtos_event_flags_t *events, uint32_t flags)
+static int set_common(rtos_event_flags_t *events, uint32_t flags)
 {
     rtos_task_t *prev;
     rtos_task_t *scan;
@@ -142,6 +142,16 @@ int rtos_event_flags_set(rtos_event_flags_t *events, uint32_t flags)
     }
 
     return RTOS_OK;
+}
+
+int rtos_event_flags_set(rtos_event_flags_t *events, uint32_t flags)
+{
+    return set_common(events, flags);
+}
+
+int rtos_event_flags_set_isr(rtos_event_flags_t *events, uint32_t flags)
+{
+    return set_common(events, flags);
 }
 
 int rtos_event_flags_clear(rtos_event_flags_t *events, uint32_t flags)

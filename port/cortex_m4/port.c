@@ -24,6 +24,14 @@ static uint32_t read_primask(void)
     return primask;
 }
 
+static uint32_t read_ipsr(void)
+{
+    uint32_t ipsr;
+
+    __asm volatile ("mrs %0, ipsr" : "=r" (ipsr) :: "memory");
+    return ipsr;
+}
+
 static void write_primask(uint32_t primask)
 {
     __asm volatile ("msr primask, %0" :: "r" (primask) : "memory");
@@ -75,6 +83,11 @@ void port_exit_critical(void)
     if (critical_nesting == 0U) {
         write_primask(saved_primask);
     }
+}
+
+uint32_t port_in_isr(void)
+{
+    return read_ipsr() != 0U;
 }
 
 void SysTick_Handler(void)

@@ -59,7 +59,8 @@ for the NUCLEO-F446RE board.
 26. Add automated probe checks. Done.
 27. Add kernel object registry. Done.
 28. Add scheduler lock. Done.
-29. Add ISR-safe wake APIs.
+29. Add ISR-safe wake APIs. Done.
+30. Add idle hooks.
 
 ## Cortex-M context switch model
 
@@ -209,3 +210,9 @@ from ticks, wakeups, or explicit yields are remembered in
 `rtos_scheduler_pending` instead of switching away from a still-running task.
 If the current task blocks or stops, the scheduler is still allowed to select a
 runnable task, which prevents a blocked task from continuing in Thread mode.
+
+ISR-safe wake APIs provide non-blocking entry points for interrupt context:
+`rtos_sem_post_isr()`, `rtos_event_flags_set_isr()`, and
+`rtos_queue_send_isr()`. They may wake tasks and request PendSV, but they do not
+wait. The demo timer callback runs in the SysTick path and uses these APIs to
+set an event flag and post a semaphore.
