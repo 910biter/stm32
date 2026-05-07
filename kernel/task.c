@@ -192,9 +192,22 @@ void rtos_task_tick(void)
     }
 }
 
+void rtos_task_delete_self(void)
+{
+    rtos_enter_critical();
+    rtos_current_task->delay_ticks = 0;
+    rtos_current_task->wait_result = RTOS_OK;
+    rtos_current_task->state = RTOS_TASK_STOPPED;
+    rtos_exit_critical();
+
+    rtos_yield();
+
+    while (1) {
+        __asm volatile ("wfi");
+    }
+}
+
 void rtos_task_exit(void)
 {
-    while (1) {
-        rtos_yield();
-    }
+    rtos_task_delete_self();
 }

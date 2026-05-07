@@ -9,6 +9,7 @@ typedef enum {
     RTOS_TASK_READY = 0,
     RTOS_TASK_RUNNING,
     RTOS_TASK_BLOCKED,
+    RTOS_TASK_STOPPED,
 } rtos_task_state_t;
 
 typedef struct rtos_task {
@@ -41,6 +42,7 @@ int rtos_task_stack_guard_ok(const rtos_task_t *task);
 void rtos_check_stack_guards(void);
 void rtos_schedule_next(void);
 void rtos_task_tick(void);
+void rtos_task_delete_self(void);
 void rtos_task_exit(void);
 
 #endif

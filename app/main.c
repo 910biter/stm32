@@ -8,6 +8,7 @@ volatile uint32_t app_timeout_count;
 volatile uint32_t app_timer_count;
 volatile uint32_t app_event_count;
 volatile uint32_t app_pool_count;
+volatile uint32_t app_exit_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
@@ -84,6 +85,13 @@ static void timer_callback(void *arg)
     (void)rtos_event_flags_set(&demo_events, 0x1U);
 }
 
+static void one_shot_task(void *arg)
+{
+    (void)arg;
+
+    app_exit_count++;
+}
+
 int main(void)
 {
     board_init();
@@ -98,6 +106,7 @@ int main(void)
     (void)rtos_task_create_named(producer_task, 0, 1, "producer");
     (void)rtos_task_create_named(consumer_task, 0, 2, "consumer");
     (void)rtos_task_create_named(timeout_task, 0, 1, "timeout");
+    (void)rtos_task_create_named(one_shot_task, 0, 1, "one-shot");
     rtos_start();
 
     while (1) {

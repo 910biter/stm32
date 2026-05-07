@@ -111,7 +111,8 @@ delay, state, wait result, and effective priority.
 17. Add software timers. Done.
 18. Add event flags. Done.
 19. Add memory pools. Done.
-20. Add task lifecycle management.
+20. Add task lifecycle management. Done.
+21. Add task slot reuse.
 
 ## Typical edit loop
 

@@ -51,7 +51,8 @@ for the NUCLEO-F446RE board.
 18. Add software timers. Done.
 19. Add event flags. Done.
 20. Add memory pools. Done.
-21. Add task lifecycle management.
+21. Add task lifecycle management. Done.
+22. Add task slot reuse.
 
 ## Cortex-M context switch model
 
@@ -157,3 +158,8 @@ Each pool owns caller-provided storage and links free blocks through the first
 word of each block. Allocation can return immediately or block with the common
 timeout path. Freeing a block hands it directly to the oldest valid waiter when
 one exists, otherwise the block returns to the free list.
+
+Task lifecycle management adds a `STOPPED` task state. A task that returns from
+its entry function reaches `rtos_task_exit()`, marks itself stopped, and yields.
+The scheduler skips stopped tasks. This first lifecycle step does not reclaim
+the task slot or stack yet; it only makes task completion explicit and safe.
