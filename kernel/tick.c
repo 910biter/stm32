@@ -10,6 +10,7 @@ static uint32_t debug_update_ticks;
 void rtos_tick_handler(void)
 {
     tick_count++;
+    rtos_task_account_tick();
     rtos_task_tick();
     rtos_timer_tick();
     rtos_check_stack_guards();

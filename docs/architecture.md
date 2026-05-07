@@ -54,7 +54,8 @@ for the NUCLEO-F446RE board.
 21. Add task lifecycle management. Done.
 22. Add task slot reuse. Done.
 23. Add priority-aware wait queues. Done.
-24. Add per-task statistics.
+24. Add per-task statistics. Done.
+25. Add probe symbol generation.
 
 ## Cortex-M context switch model
 
@@ -177,3 +178,8 @@ memory pools insert blocked tasks by effective priority, highest first. Tasks
 with equal priority keep FIFO order. This makes wakeups line up with the
 scheduler's priority model instead of allowing an older low-priority waiter to
 run ahead of a newer high-priority waiter.
+
+Per-task statistics track how often each task is selected by the scheduler and
+how many SysTick intervals it has spent running. These counters live in the TCB
+and are exported through debug snapshots, giving a simple view of scheduler
+activity without needing trace hardware.

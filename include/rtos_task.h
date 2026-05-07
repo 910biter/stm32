@@ -29,6 +29,8 @@ typedef struct rtos_task {
     uint32_t wait_flags_all;
     uint32_t wait_flags_clear;
     void *wait_object_result;
+    uint32_t switch_count;
+    uint32_t run_ticks;
 } rtos_task_t;
 
 extern rtos_task_t *rtos_current_task;
@@ -42,6 +44,7 @@ int rtos_task_stack_guard_ok(const rtos_task_t *task);
 void rtos_check_stack_guards(void);
 void rtos_schedule_next(void);
 void rtos_task_tick(void);
+void rtos_task_account_tick(void);
 void rtos_task_delete_self(void);
 void rtos_task_exit(void);
 

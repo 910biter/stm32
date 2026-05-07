@@ -107,6 +107,8 @@ int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority
     task->wait_flags_all = 0;
     task->wait_flags_clear = 0;
     task->wait_object_result = NULL;
+    task->switch_count = 0;
+    task->run_ticks = 0;
 
     if (is_new_slot != 0) {
         if (task_count == 1U) {
@@ -225,6 +227,13 @@ void rtos_task_tick(void)
                 task->state = RTOS_TASK_READY;
             }
         }
+    }
+}
+
+void rtos_task_account_tick(void)
+{
+    if ((rtos_current_task != NULL) && (rtos_current_task->state == RTOS_TASK_RUNNING)) {
+        rtos_current_task->run_ticks++;
     }
 }
 

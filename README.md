@@ -114,7 +114,8 @@ delay, state, wait result, and effective priority.
 20. Add task lifecycle management. Done.
 21. Add task slot reuse. Done.
 22. Add priority-aware wait queues. Done.
-23. Add per-task statistics.
+23. Add per-task statistics. Done.
+24. Add probe symbol generation.
 
 ## Typical edit loop
 

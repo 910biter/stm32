@@ -19,6 +19,8 @@ typedef struct rtos_task_snapshot {
     rtos_task_state_t state;
     int32_t wait_result;
     uint32_t stack_guard_ok;
+    uint32_t switch_count;
+    uint32_t run_ticks;
 } rtos_task_snapshot_t;
 
 extern volatile uint32_t rtos_debug_snapshot_count;

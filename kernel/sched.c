@@ -14,6 +14,7 @@ void rtos_start(void)
     }
 
     rtos_current_task->state = RTOS_TASK_RUNNING;
+    rtos_current_task->switch_count++;
     port_init_scheduler();
     port_setup_systick(RTOS_CPU_HZ, RTOS_TICK_HZ);
     port_start_first_task();
@@ -73,5 +74,6 @@ void rtos_schedule_next(void)
     }
 
     best_task->state = RTOS_TASK_RUNNING;
+    best_task->switch_count++;
     rtos_current_task = best_task;
 }
