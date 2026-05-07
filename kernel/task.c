@@ -12,6 +12,15 @@ static uint32_t task_count;
 
 rtos_task_t *rtos_current_task;
 
+static void idle_task(void *arg)
+{
+    (void)arg;
+
+    while (1) {
+        __asm volatile ("wfi");
+    }
+}
+
 static uint32_t *align_stack(uint32_t *sp)
 {
     return (uint32_t *)((uintptr_t)sp & ~((uintptr_t)0x7U));
@@ -61,6 +70,26 @@ int rtos_task_create(rtos_task_entry_t entry, void *arg)
 
     task_count++;
     return 0;
+}
+
+int rtos_create_idle_task(void)
+{
+    return rtos_task_create(idle_task, NULL);
+}
+
+void rtos_task_tick(void)
+{
+    for (uint32_t i = 0; i < task_count; ++i) {
+        rtos_task_t *task = &tasks[i];
+
+        if ((task->state == RTOS_TASK_BLOCKED) && (task->delay_ticks > 0U)) {
+            task->delay_ticks--;
+
+            if (task->delay_ticks == 0U) {
+                task->state = RTOS_TASK_READY;
+            }
+        }
+    }
 }
 
 void rtos_task_exit(void)

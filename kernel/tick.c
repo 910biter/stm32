@@ -7,6 +7,7 @@ static volatile uint32_t tick_count;
 void rtos_tick_handler(void)
 {
     tick_count++;
+    rtos_task_tick();
     port_trigger_pendsv();
 }
 

@@ -22,7 +22,9 @@ typedef struct rtos_task {
 
 extern rtos_task_t *rtos_current_task;
 
+int rtos_create_idle_task(void);
 void rtos_schedule_next(void);
+void rtos_task_tick(void);
 void rtos_task_exit(void);
 
 #endif

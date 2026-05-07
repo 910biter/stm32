@@ -35,7 +35,7 @@ for the NUCLEO-F446RE board.
 2. Add static task creation and per-task stacks. Done.
 3. Implement cooperative `rtos_yield()` through PendSV. Done.
 4. Add SysTick and round-robin preemption. Done.
-5. Add `rtos_sleep()` so tasks block instead of spinning.
+5. Add `rtos_sleep()` so tasks block instead of spinning. Done.
 6. Add critical sections and basic synchronization primitives.
 
 ## Cortex-M context switch model
@@ -55,3 +55,8 @@ The first preemptive implementation configures SysTick from the default
 16 MHz reset clock and requests PendSV from `SysTick_Handler`. The demo tasks
 busy-loop without calling `rtos_yield()`, so round-robin progress now depends
 on the tick interrupt.
+
+`rtos_sleep()` marks the current task as blocked and stores a delay in ticks.
+Each SysTick decrements blocked task delays and moves expired tasks back to the
+ready state. The kernel creates an internal idle task during `rtos_start()` so
+the scheduler always has a ready task while application tasks are sleeping.

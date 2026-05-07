@@ -3,5 +3,6 @@ reset run
 sleep 2000
 halt
 mem2array counters 32 0x20000000 4
-echo [format "task counters: task1=%u task2=%u raw2=0x%08x raw3=0x%08x" $counters(0) $counters(1) $counters(2) $counters(3)]
+mem2array ticks 32 0x20000870 1
+echo [format "task counters: task1=%u task2=%u tick=%u raw2=0x%08x raw3=0x%08x" $counters(0) $counters(1) $ticks(0) $counters(2) $counters(3)]
 shutdown

@@ -15,7 +15,7 @@
 
 void port_init_scheduler(void)
 {
-    SCB_SHPR3 |= (0xFFUL << 16) | (0xFEUL << 24);
+    SCB_SHPR3 |= (0xFFUL << 16) | (0xFFUL << 24);
 }
 
 void port_setup_systick(uint32_t cpu_hz, uint32_t tick_hz)
