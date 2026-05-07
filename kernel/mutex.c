@@ -67,6 +67,10 @@ int rtos_mutex_lock(rtos_mutex_t *mutex)
             return 0;
         }
 
+        if (rtos_current_task->priority > mutex->owner->priority) {
+            mutex->owner->priority = rtos_current_task->priority;
+        }
+
         task = rtos_current_task;
         task->state = RTOS_TASK_BLOCKED;
         task->delay_ticks = 0;
@@ -99,6 +103,7 @@ int rtos_mutex_unlock(rtos_mutex_t *mutex)
         return 0;
     }
 
+    mutex->owner->priority = mutex->owner->base_priority;
     mutex->owner = NULL;
 
     task = wait_pop(&mutex->wait_head, &mutex->wait_tail);

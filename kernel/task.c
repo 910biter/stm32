@@ -58,6 +58,7 @@ int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t 
     task->stack_base = stack;
     task->stack_words = RTOS_TASK_STACK_WORDS;
     task->delay_ticks = 0;
+    task->base_priority = priority;
     task->priority = priority;
     task->state = RTOS_TASK_READY;
     task->wait_next = NULL;
@@ -77,6 +78,16 @@ int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t 
 int rtos_task_create(rtos_task_entry_t entry, void *arg)
 {
     return rtos_task_create_with_priority(entry, arg, RTOS_DEFAULT_PRIORITY);
+}
+
+uint32_t rtos_current_priority(void)
+{
+    return rtos_current_task->priority;
+}
+
+uint32_t rtos_current_base_priority(void)
+{
+    return rtos_current_task->base_priority;
 }
 
 int rtos_create_idle_task(void)

@@ -3,6 +3,7 @@
 
 volatile uint32_t app_task1_count;
 volatile uint32_t app_task2_count;
+volatile uint32_t app_priority_boost_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
@@ -19,6 +20,9 @@ static void producer_task(void *arg)
         (void)rtos_mutex_lock(&app_mutex);
         app_task1_count++;
         (void)rtos_queue_send(&led_queue, message++);
+        if (rtos_current_priority() > rtos_current_base_priority()) {
+            app_priority_boost_count++;
+        }
         (void)rtos_mutex_unlock(&app_mutex);
         (void)rtos_mutex_unlock(&app_mutex);
         rtos_sleep(250);
