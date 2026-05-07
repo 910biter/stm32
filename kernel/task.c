@@ -6,10 +6,12 @@
 #define INITIAL_XPSR        0x01000000UL
 #define EXC_RETURN_THREAD_PSP 0xFFFFFFFDUL
 #define STACK_FILL_PATTERN  0xA5A5A5A5UL
+#define STACK_GUARD_WORDS   8U
 
 static rtos_task_t tasks[RTOS_MAX_TASKS];
 static uint32_t task_stacks[RTOS_MAX_TASKS][RTOS_TASK_STACK_WORDS];
 static uint32_t task_count;
+static uint32_t stack_guard_check_index;
 
 rtos_task_t *rtos_current_task;
 
@@ -136,6 +138,42 @@ uint32_t rtos_task_stack_used_words(const rtos_task_t *task)
     }
 
     return task->stack_words - unused;
+}
+
+int rtos_task_stack_guard_ok(const rtos_task_t *task)
+{
+    uint32_t guard_words = STACK_GUARD_WORDS;
+
+    if ((task == NULL) || (task->stack_base == NULL)) {
+        return 0;
+    }
+
+    if (guard_words > task->stack_words) {
+        guard_words = task->stack_words;
+    }
+
+    for (uint32_t i = 0; i < guard_words; ++i) {
+        if (task->stack_base[i] != STACK_FILL_PATTERN) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+void rtos_check_stack_guards(void)
+{
+    if (task_count == 0U) {
+        return;
+    }
+
+    if (stack_guard_check_index >= task_count) {
+        stack_guard_check_index = 0;
+    }
+
+    RTOS_ASSERT(rtos_task_stack_guard_ok(&tasks[stack_guard_check_index]) != 0);
+
+    stack_guard_check_index++;
 }
 
 void rtos_task_tick(void)

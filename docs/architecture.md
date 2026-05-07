@@ -47,7 +47,8 @@ for the NUCLEO-F446RE board.
 14. Add basic fault diagnostics. Done.
 15. Add timeouts for blocking primitives. Done.
 16. Add runtime assertions. Done.
-17. Add stack overflow checks.
+17. Add stack overflow checks. Done.
+18. Add software timers.
 
 ## Cortex-M context switch model
 
@@ -128,3 +129,11 @@ interrupts, records the expression, file, line, tick count, and current task in
 `rtos_assert_info`, then parks the CPU. The scheduler now asserts that a ready
 task was found, which should always hold because `rtos_start()` creates an idle
 task.
+
+Stack overflow checks reserve the low end of each downward-growing task stack
+as guard words. The guard uses the same fill pattern as the stack watermark.
+Each tick checks one task guard, rotating through the task table; a corrupted
+guard trips `RTOS_ASSERT()` and leaves the failed expression in SRAM for
+OpenOCD. Debug snapshots are refreshed at a lower rate than the scheduler tick
+because stack-watermark scans are useful for inspection but too heavy to run in
+every 1 kHz interrupt.

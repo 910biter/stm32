@@ -27,6 +27,7 @@ void rtos_debug_update(void)
         rtos_debug_snapshots[i].priority = task->priority;
         rtos_debug_snapshots[i].state = task->state;
         rtos_debug_snapshots[i].wait_result = task->wait_result;
+        rtos_debug_snapshots[i].stack_guard_ok = (uint32_t)rtos_task_stack_guard_ok(task);
     }
 
     rtos_debug_snapshot_count = count;
@@ -59,6 +60,7 @@ uint32_t rtos_debug_snapshot(rtos_task_snapshot_t *out, uint32_t max_count)
         out[i].priority = rtos_debug_snapshots[i].priority;
         out[i].state = rtos_debug_snapshots[i].state;
         out[i].wait_result = rtos_debug_snapshots[i].wait_result;
+        out[i].stack_guard_ok = rtos_debug_snapshots[i].stack_guard_ok;
     }
     rtos_exit_critical();
 

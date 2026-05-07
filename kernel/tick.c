@@ -2,13 +2,21 @@
 
 #include "port.h"
 
+#define DEBUG_UPDATE_PERIOD_TICKS 100U
+
 static volatile uint32_t tick_count;
+static uint32_t debug_update_ticks;
 
 void rtos_tick_handler(void)
 {
     tick_count++;
     rtos_task_tick();
-    rtos_debug_update();
+    rtos_check_stack_guards();
+    if (debug_update_ticks == 0U) {
+        rtos_debug_update();
+        debug_update_ticks = DEBUG_UPDATE_PERIOD_TICKS;
+    }
+    debug_update_ticks--;
     port_trigger_pendsv();
 }
 

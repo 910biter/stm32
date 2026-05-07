@@ -32,6 +32,8 @@ int rtos_create_idle_task(void);
 uint32_t rtos_task_count(void);
 rtos_task_t *rtos_task_at(uint32_t index);
 uint32_t rtos_task_stack_used_words(const rtos_task_t *task);
+int rtos_task_stack_guard_ok(const rtos_task_t *task);
+void rtos_check_stack_guards(void);
 void rtos_schedule_next(void);
 void rtos_task_tick(void);
 void rtos_task_exit(void);
