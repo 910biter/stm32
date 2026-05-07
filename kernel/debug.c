@@ -33,6 +33,7 @@ void rtos_debug_update(void)
     }
 
     rtos_debug_snapshot_count = count;
+    rtos_object_debug_update();
 }
 
 uint32_t rtos_debug_snapshot(rtos_task_snapshot_t *out, uint32_t max_count)

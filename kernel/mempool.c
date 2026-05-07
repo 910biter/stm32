@@ -121,6 +121,7 @@ int rtos_mempool_init(rtos_mempool_t *pool, void *storage, uint32_t block_size, 
         push_free_block(pool, &bytes[i * pool->block_size]);
     }
 
+    (void)rtos_object_register(pool, RTOS_OBJECT_MEMPOOL);
     return RTOS_OK;
 }
 

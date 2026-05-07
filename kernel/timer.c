@@ -40,6 +40,7 @@ int rtos_timer_init(rtos_timer_t *timer,
     timer->callback = callback;
     timer->arg = arg;
     link_timer(timer);
+    (void)rtos_object_register(timer, RTOS_OBJECT_TIMER);
     rtos_exit_critical();
 
     return RTOS_OK;

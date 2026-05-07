@@ -26,6 +26,7 @@ C_SOURCES := \
 	kernel/list.c \
 	kernel/mempool.c \
 	kernel/mutex.c \
+	kernel/object.c \
 	kernel/queue.c \
 	kernel/sched.c \
 	kernel/sem.c \

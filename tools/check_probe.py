@@ -5,6 +5,7 @@ import sys
 
 PAIR_RE = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)=(-?0x[0-9a-fA-F]+|-?\d+)")
 TASK_RE = re.compile(r"^task(\d+):\s+(.*)$")
+OBJECT_RE = re.compile(r"^object(\d+):\s+(.*)$")
 
 
 def parse_int(value):
@@ -20,6 +21,8 @@ def load_probe(path):
     tasks = {}
     assertion = None
     fault = None
+    object_count = None
+    objects = {}
 
     with open(path, "r", encoding="utf-8", errors="replace") as log:
         for raw_line in log:
@@ -39,8 +42,17 @@ def load_probe(path):
 
             if line.startswith("fault:"):
                 fault = parse_pairs(line)
+                continue
 
-    return counters, tasks, assertion, fault
+            if line.startswith("object_count="):
+                object_count = parse_int(line.split("=", 1)[1])
+                continue
+
+            object_match = OBJECT_RE.match(line)
+            if object_match:
+                objects[int(object_match.group(1))] = parse_pairs(object_match.group(2))
+
+    return counters, tasks, assertion, fault, object_count, objects
 
 
 def require(errors, condition, message):
@@ -48,13 +60,14 @@ def require(errors, condition, message):
         errors.append(message)
 
 
-def check_probe(counters, tasks, assertion, fault):
+def check_probe(counters, tasks, assertion, fault, object_count, objects):
     errors = []
 
     require(errors, counters is not None, "missing task counters line")
     require(errors, assertion is not None, "missing assert line")
     require(errors, fault is not None, "missing fault line")
     require(errors, bool(tasks), "missing task snapshot lines")
+    require(errors, object_count is not None, "missing object count line")
 
     if counters is not None:
         require(errors, counters.get("produced", 0) >= 5, "producer did not run enough times")
@@ -96,6 +109,18 @@ def check_probe(counters, tasks, assertion, fault):
             require(errors, task.get("used", 0) > 0, f"task{index} stack watermark did not move")
             require(errors, task.get("guard") == 1, f"task{index} stack guard is corrupted")
 
+    if object_count is not None:
+        live_objects = [obj for obj in objects.values() if obj.get("type", 0) != 0]
+        live_types = {obj.get("type") for obj in live_objects}
+        require(errors, object_count == len(live_objects), "object count does not match non-empty object lines")
+        require(errors, object_count >= 6, "expected at least six registered kernel objects")
+        require(errors, {1, 2, 3, 4, 5, 6}.issubset(live_types), "not all demo object types were registered")
+        for index, obj in sorted(objects.items()):
+            if obj.get("type", 0) == 0:
+                continue
+            require(errors, obj.get("object", 0) != 0, f"object{index} has no object pointer")
+            require(errors, obj.get("name", 0) != 0, f"object{index} has no debug name")
+
     return errors
 
 
@@ -103,8 +128,8 @@ def main():
     if len(sys.argv) != 2:
         raise SystemExit("usage: check_probe.py <probe.log>")
 
-    counters, tasks, assertion, fault = load_probe(sys.argv[1])
-    errors = check_probe(counters, tasks, assertion, fault)
+    counters, tasks, assertion, fault, object_count, objects = load_probe(sys.argv[1])
+    errors = check_probe(counters, tasks, assertion, fault, object_count, objects)
     if errors:
         print("probe checks failed:")
         for error in errors:

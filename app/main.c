@@ -116,6 +116,12 @@ int main(void)
     (void)rtos_event_flags_init(&demo_events);
     (void)rtos_mempool_init(&demo_pool, demo_pool_storage, sizeof(demo_pool_storage[0]), 4);
     (void)rtos_timer_init(&demo_timer, 500, 1, timer_callback, 0);
+    (void)rtos_object_set_name(&led_queue, "led_queue");
+    (void)rtos_object_set_name(&app_mutex, "app_mutex");
+    (void)rtos_object_set_name(&timeout_sem, "timeout_sem");
+    (void)rtos_object_set_name(&demo_events, "demo_events");
+    (void)rtos_object_set_name(&demo_pool, "demo_pool");
+    (void)rtos_object_set_name(&demo_timer, "demo_timer");
     (void)rtos_timer_start(&demo_timer);
     (void)rtos_task_create_named(producer_task, 0, 1, "producer");
     (void)rtos_task_create_named(consumer_task, 0, 2, "consumer");

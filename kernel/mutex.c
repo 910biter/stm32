@@ -108,6 +108,7 @@ int rtos_mutex_init(rtos_mutex_t *mutex)
     mutex->lock_count = 0;
     mutex->wait_head = NULL;
     mutex->wait_tail = NULL;
+    (void)rtos_object_register(mutex, RTOS_OBJECT_MUTEX);
     return 0;
 }
 

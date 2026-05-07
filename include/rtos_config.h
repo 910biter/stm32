@@ -7,5 +7,6 @@
 #define RTOS_IDLE_PRIORITY      0U
 #define RTOS_CPU_HZ             16000000U
 #define RTOS_TICK_HZ            1000U
+#define RTOS_MAX_OBJECTS        16U
 
 #endif

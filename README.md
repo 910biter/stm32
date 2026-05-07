@@ -86,8 +86,8 @@ make check-probe
 ```
 
 This captures the same OpenOCD probe output in `build/probe.log` and checks the
-demo counters, task snapshots, stack guards, assertion state, and HardFault
-state.
+demo counters, task snapshots, kernel object registry, stack guards, assertion
+state, and HardFault state.
 
 ## Bare-metal structure
 
@@ -127,7 +127,8 @@ state.
 23. Add per-task statistics. Done.
 24. Add probe symbol generation. Done.
 25. Add automated probe checks. Done.
-26. Add kernel object registry.
+26. Add kernel object registry. Done.
+27. Add scheduler lock.
 
 ## Typical edit loop
 

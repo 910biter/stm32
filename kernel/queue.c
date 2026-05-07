@@ -99,6 +99,7 @@ int rtos_queue_init(rtos_queue_t *queue, uint32_t *buffer, uint32_t capacity)
     queue->recv_wait_tail = NULL;
     queue->send_wait_head = NULL;
     queue->send_wait_tail = NULL;
+    (void)rtos_object_register(queue, RTOS_OBJECT_QUEUE);
     return 0;
 }
 

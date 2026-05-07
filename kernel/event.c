@@ -82,6 +82,7 @@ int rtos_event_flags_init(rtos_event_flags_t *events)
     events->flags = 0;
     events->wait_head = NULL;
     events->wait_tail = NULL;
+    (void)rtos_object_register(events, RTOS_OBJECT_EVENT_FLAGS);
     return RTOS_OK;
 }
 

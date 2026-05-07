@@ -57,7 +57,8 @@ for the NUCLEO-F446RE board.
 24. Add per-task statistics. Done.
 25. Add probe symbol generation. Done.
 26. Add automated probe checks. Done.
-27. Add kernel object registry.
+27. Add kernel object registry. Done.
+28. Add scheduler lock.
 
 ## Cortex-M context switch model
 
@@ -195,3 +196,9 @@ Automated probe checks turn that debug output into a hardware smoke test.
 `make check-probe` records the OpenOCD output in `build/probe.log`, then
 `tools/check_probe.py` verifies that the demo tasks made progress, stack guards
 are intact, and neither runtime assertions nor HardFault diagnostics are active.
+
+The kernel object registry records initialized queues, semaphores, mutexes,
+timers, event flag groups, and memory pools in a fixed table. Objects register
+themselves during initialization, and applications can attach debug names with
+`rtos_object_set_name()`. The registry is exported through SRAM snapshots so
+OpenOCD can show object addresses and types alongside task snapshots.

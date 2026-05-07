@@ -12,6 +12,7 @@ int rtos_sem_init(rtos_sem_t *sem, uint32_t initial_count, uint32_t max_count)
     sem->max_count = max_count;
     sem->wait_head = NULL;
     sem->wait_tail = NULL;
+    (void)rtos_object_register(sem, RTOS_OBJECT_SEM);
     return 0;
 }
 

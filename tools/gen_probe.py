@@ -5,6 +5,7 @@ import sys
 
 
 SNAPSHOT_WORDS = 14
+OBJECT_SNAPSHOT_WORDS = 3
 
 
 def load_symbols(elf_path):
@@ -18,14 +19,14 @@ def load_symbols(elf_path):
     return symbols
 
 
-def load_max_tasks(config_path):
-    pattern = re.compile(r"^\s*#define\s+RTOS_MAX_TASKS\s+(\d+)U?\s*$")
+def load_config_define(config_path, define_name):
+    pattern = re.compile(rf"^\s*#define\s+{re.escape(define_name)}\s+(\d+)U?\s*$")
     with open(config_path, "r", encoding="utf-8") as config:
         for line in config:
             match = pattern.match(line)
             if match:
                 return int(match.group(1))
-    raise SystemExit("RTOS_MAX_TASKS not found")
+    raise SystemExit(f"{define_name} not found")
 
 
 def symbol(symbols, name):
@@ -44,7 +45,8 @@ def main():
         raise SystemExit("usage: gen_probe.py <elf> <rtos_config.h>")
 
     symbols = load_symbols(sys.argv[1])
-    max_tasks = load_max_tasks(sys.argv[2])
+    max_tasks = load_config_define(sys.argv[2], "RTOS_MAX_TASKS")
+    max_objects = load_config_define(sys.argv[2], "RTOS_MAX_OBJECTS")
 
     counter_names = [
         "app_task1_count",
@@ -70,6 +72,8 @@ def main():
     emit_mem("pool_state", symbol(symbols, "demo_pool"), 7)
     emit_mem("debug_count", symbol(symbols, "rtos_debug_snapshot_count"), 1)
     emit_mem("snapshots", symbol(symbols, "rtos_debug_snapshots"), max_tasks * SNAPSHOT_WORDS)
+    emit_mem("object_count", symbol(symbols, "rtos_object_snapshot_count"), 1)
+    emit_mem("object_snapshots", symbol(symbols, "rtos_object_snapshots"), max_objects * OBJECT_SNAPSHOT_WORDS)
     emit_mem("tick_state", symbol(symbols, "tick_count"), 1)
     emit_mem("assert_info", symbol(symbols, "rtos_assert_info"), 6)
     emit_mem("kernel_state", symbol(symbols, "critical_nesting"), 2)
@@ -81,6 +85,12 @@ def main():
         base = task_index * SNAPSHOT_WORDS
         args = " ".join(f"$snapshots({base + field})" for field in range(SNAPSHOT_WORDS))
         print(f'echo [format "task{task_index}: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d guard=%u switches=%u run_ticks=%u" {args}]')
+
+    print('echo [format "object_count=%u" $object_count(0)]')
+    for object_index in range(max_objects):
+        base = object_index * OBJECT_SNAPSHOT_WORDS
+        args = " ".join(f"$object_snapshots({base + field})" for field in range(OBJECT_SNAPSHOT_WORDS))
+        print(f'echo [format "object{object_index}: type=%u object=0x%08x name=0x%08x" {args}]')
 
     print('echo [format "assert: active=%u expression=0x%08x file=0x%08x line=%u tick=%u task=0x%08x" $assert_info(0) $assert_info(1) $assert_info(2) $assert_info(3) $assert_info(4) $assert_info(5)]')
     print('echo [format "fault: active=%u exc_return=0x%08x sp=0x%08x pc=0x%08x lr=0x%08x xpsr=0x%08x cfsr=0x%08x hfsr=0x%08x bfar=0x%08x mmfar=0x%08x" $fault_info(0) $fault_info(1) $fault_info(2) $fault_info(9) $fault_info(8) $fault_info(10) $fault_info(11) $fault_info(12) $fault_info(15) $fault_info(16)]')
