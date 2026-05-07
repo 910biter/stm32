@@ -17,6 +17,7 @@ typedef struct rtos_task_snapshot {
     uint32_t base_priority;
     uint32_t priority;
     rtos_task_state_t state;
+    int32_t wait_result;
 } rtos_task_snapshot_t;
 
 extern volatile uint32_t rtos_debug_snapshot_count;

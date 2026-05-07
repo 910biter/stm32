@@ -22,6 +22,7 @@ typedef struct rtos_task {
     struct rtos_task *next;
     struct rtos_task *wait_next;
     const char *name;
+    int32_t wait_result;
 } rtos_task_t;
 
 extern rtos_task_t *rtos_current_task;

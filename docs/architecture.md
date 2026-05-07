@@ -45,7 +45,8 @@ for the NUCLEO-F446RE board.
 12. Add debug task listing. Done.
 13. Add an SVC-based scheduler start path. Done.
 14. Add basic fault diagnostics. Done.
-15. Add timeouts for blocking primitives.
+15. Add timeouts for blocking primitives. Done.
+16. Add runtime assertions.
 
 ## Cortex-M context switch model
 
@@ -113,3 +114,10 @@ selects MSP or PSP from the exception return value, then the C handler records
 the stacked core registers plus CFSR, HFSR, DFSR, AFSR, BFAR, and MMFAR before
 parking the CPU. This gives OpenOCD a stable SRAM record to inspect after a
 crash.
+
+Blocking primitives have timeout variants. A blocked task records a wait result
+and an optional delay. The tick handler marks timed-out tasks ready with
+`RTOS_ERR_TIMEOUT`; the primitive then removes that task from its wait FIFO
+before returning. Wake paths also skip waiters that already timed out, which
+keeps object queues consistent when a timeout races with a post, send, receive,
+or unlock.

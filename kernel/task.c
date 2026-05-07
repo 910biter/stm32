@@ -68,6 +68,7 @@ int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority
     task->priority = priority;
     task->state = RTOS_TASK_READY;
     task->wait_next = NULL;
+    task->wait_result = RTOS_OK;
 
     if (task_count == 0U) {
         task->next = task;
@@ -144,6 +145,7 @@ void rtos_task_tick(void)
             task->delay_ticks--;
 
             if (task->delay_ticks == 0U) {
+                task->wait_result = RTOS_ERR_TIMEOUT;
                 task->state = RTOS_TASK_READY;
             }
         }

@@ -36,13 +36,11 @@ void rtos_sleep(uint32_t ms)
         return;
     }
 
-    ticks = ((ms * RTOS_TICK_HZ) + 999U) / 1000U;
-    if (ticks == 0U) {
-        ticks = 1U;
-    }
+    ticks = rtos_ms_to_ticks(ms);
 
     rtos_enter_critical();
     rtos_current_task->delay_ticks = ticks;
+    rtos_current_task->wait_result = RTOS_OK;
     rtos_current_task->state = RTOS_TASK_BLOCKED;
     rtos_exit_critical();
 

@@ -16,3 +16,19 @@ uint32_t rtos_tick_count(void)
 {
     return tick_count;
 }
+
+uint32_t rtos_ms_to_ticks(uint32_t ms)
+{
+    uint32_t ticks;
+
+    if (ms == RTOS_TIMEOUT_FOREVER) {
+        return 0;
+    }
+
+    ticks = ((ms * RTOS_TICK_HZ) + 999U) / 1000U;
+    if (ticks == 0U) {
+        ticks = 1U;
+    }
+
+    return ticks;
+}

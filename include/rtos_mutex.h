@@ -14,6 +14,7 @@ typedef struct rtos_mutex {
 
 int rtos_mutex_init(rtos_mutex_t *mutex);
 int rtos_mutex_lock(rtos_mutex_t *mutex);
+int rtos_mutex_lock_timeout(rtos_mutex_t *mutex, uint32_t timeout_ms);
 int rtos_mutex_unlock(rtos_mutex_t *mutex);
 
 #endif

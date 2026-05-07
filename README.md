@@ -74,9 +74,10 @@ from SRAM. The producer sends a queue message every 250 ms, and the consumer
 blocks on that queue before toggling LD2. The consumer runs at a higher
 priority than the producer, so queue send should promptly wake it. The demo
 also protects the producer/consumer handoff with a recursive mutex and counts
-producer priority inheritance events. The debug snapshots include each task's
-TCB pointer, PSP, stack base, stack use estimate, delay, state, and effective
-priority.
+producer priority inheritance events. A third task waits on an empty semaphore
+with a 100 ms timeout so timeout wakeups are visible in SRAM. The debug
+snapshots include each task's TCB pointer, PSP, stack base, stack use estimate,
+delay, state, wait result, and effective priority.
 
 ## Bare-metal structure
 
@@ -104,7 +105,8 @@ priority.
 11. Add debug task listing. Done.
 12. Add an SVC-based scheduler start path. Done.
 13. Add basic fault diagnostics. Done.
-14. Add timeouts for blocking primitives.
+14. Add timeouts for blocking primitives. Done.
+15. Add runtime assertions.
 
 ## Typical edit loop
 

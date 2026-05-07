@@ -19,6 +19,8 @@ typedef struct rtos_queue {
 
 int rtos_queue_init(rtos_queue_t *queue, uint32_t *buffer, uint32_t capacity);
 int rtos_queue_send(rtos_queue_t *queue, uint32_t value);
+int rtos_queue_send_timeout(rtos_queue_t *queue, uint32_t value, uint32_t timeout_ms);
 int rtos_queue_recv(rtos_queue_t *queue, uint32_t *value);
+int rtos_queue_recv_timeout(rtos_queue_t *queue, uint32_t *value, uint32_t timeout_ms);
 
 #endif

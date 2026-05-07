@@ -14,6 +14,7 @@ typedef struct rtos_sem {
 
 int rtos_sem_init(rtos_sem_t *sem, uint32_t initial_count, uint32_t max_count);
 int rtos_sem_wait(rtos_sem_t *sem);
+int rtos_sem_wait_timeout(rtos_sem_t *sem, uint32_t timeout_ms);
 int rtos_sem_post(rtos_sem_t *sem);
 
 #endif
