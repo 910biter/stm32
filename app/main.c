@@ -10,7 +10,11 @@ static void led_task(void *arg)
 
     while (1) {
         board_led_on();
+        rtos_enter_critical();
+        rtos_enter_critical();
         app_task1_count++;
+        rtos_exit_critical();
+        rtos_exit_critical();
         rtos_sleep(250);
     }
 }
@@ -21,7 +25,11 @@ static void led_off_task(void *arg)
 
     while (1) {
         board_led_off();
+        rtos_enter_critical();
+        rtos_enter_critical();
         app_task2_count++;
+        rtos_exit_critical();
+        rtos_exit_critical();
         rtos_sleep(250);
     }
 }

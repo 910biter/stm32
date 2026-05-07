@@ -17,6 +17,7 @@ LDFLAGS := $(CPU) -T $(LDSCRIPT) -nostartfiles -Wl,--gc-sections -Wl,-Map=$(BUIL
 C_SOURCES := \
 	app/main.c \
 	board/board.c \
+	kernel/critical.c \
 	kernel/list.c \
 	kernel/sched.c \
 	kernel/task.c \

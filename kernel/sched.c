@@ -41,10 +41,10 @@ void rtos_sleep(uint32_t ms)
         ticks = 1U;
     }
 
-    port_enter_critical();
+    rtos_enter_critical();
     rtos_current_task->delay_ticks = ticks;
     rtos_current_task->state = RTOS_TASK_BLOCKED;
-    port_exit_critical();
+    rtos_exit_critical();
 
     rtos_yield();
 }

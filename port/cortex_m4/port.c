@@ -13,6 +13,22 @@
 #define SYST_CSR_TICKINT    (1UL << 1)
 #define SYST_CSR_CLKSOURCE  (1UL << 2)
 
+static uint32_t critical_nesting;
+static uint32_t saved_primask;
+
+static uint32_t read_primask(void)
+{
+    uint32_t primask;
+
+    __asm volatile ("mrs %0, primask" : "=r" (primask) :: "memory");
+    return primask;
+}
+
+static void write_primask(uint32_t primask)
+{
+    __asm volatile ("msr primask, %0" :: "r" (primask) : "memory");
+}
+
 void port_init_scheduler(void)
 {
     SCB_SHPR3 |= (0xFFUL << 16) | (0xFFUL << 24);
@@ -37,12 +53,28 @@ void port_trigger_pendsv(void)
 
 void port_enter_critical(void)
 {
+    uint32_t primask = read_primask();
+
     __asm volatile ("cpsid i" ::: "memory");
+
+    if (critical_nesting == 0U) {
+        saved_primask = primask;
+    }
+
+    critical_nesting++;
 }
 
 void port_exit_critical(void)
 {
-    __asm volatile ("cpsie i" ::: "memory");
+    if (critical_nesting == 0U) {
+        return;
+    }
+
+    critical_nesting--;
+
+    if (critical_nesting == 0U) {
+        write_primask(saved_primask);
+    }
 }
 
 void SysTick_Handler(void)

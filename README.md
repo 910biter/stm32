@@ -70,7 +70,8 @@ make probe
 The probe script lets the firmware run for two seconds, halts the MCU, and
 prints the two demo task counters plus the RTOS tick count from SRAM. The
 current demo tasks sleep for 250 ms, so both counters increasing means blocked
-task wakeup is working.
+task wakeup is working. It also prints the critical-section nesting count,
+which should be zero when the probe halts outside a critical section.
 
 ## Bare-metal structure
 
@@ -89,7 +90,8 @@ task wakeup is working.
 2. Add cooperative task switching with independent task stacks and PendSV. Done.
 3. Add SysTick-based preemption. Done.
 4. Add `rtos_sleep()` and blocked task wakeup. Done.
-5. Add critical sections, then semaphores, mutexes, and queues.
+5. Add nested critical sections. Done.
+6. Add semaphores, mutexes, and queues.
 
 ## Typical edit loop
 

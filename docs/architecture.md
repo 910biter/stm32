@@ -36,7 +36,8 @@ for the NUCLEO-F446RE board.
 3. Implement cooperative `rtos_yield()` through PendSV. Done.
 4. Add SysTick and round-robin preemption. Done.
 5. Add `rtos_sleep()` so tasks block instead of spinning. Done.
-6. Add critical sections and basic synchronization primitives.
+6. Add nested critical sections. Done.
+7. Add basic synchronization primitives.
 
 ## Cortex-M context switch model
 
@@ -60,3 +61,8 @@ on the tick interrupt.
 Each SysTick decrements blocked task delays and moves expired tasks back to the
 ready state. The kernel creates an internal idle task during `rtos_start()` so
 the scheduler always has a ready task while application tasks are sleeping.
+
+Critical sections are exposed as `rtos_enter_critical()` and
+`rtos_exit_critical()`. The Cortex-M4 port saves the outermost PRIMASK value,
+disables interrupts, tracks nested entries, and restores the saved PRIMASK only
+when the final nested critical section exits.
