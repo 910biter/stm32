@@ -106,12 +106,15 @@ int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority
     task->priority = priority;
     task->state = RTOS_TASK_READY;
     task->wait_next = NULL;
+    task->wait_type = RTOS_WAIT_NONE;
     task->wait_result = RTOS_OK;
     task->wait_flags = 0;
     task->wait_flags_result = 0;
     task->wait_flags_all = 0;
     task->wait_flags_clear = 0;
     task->wait_object_result = NULL;
+    task->notify_value = 0;
+    task->notify_pending = 0;
     task->switch_count = 0;
     task->run_ticks = 0;
 
@@ -157,6 +160,11 @@ int rtos_create_idle_task(void)
 uint32_t rtos_task_count(void)
 {
     return task_count;
+}
+
+rtos_task_t *rtos_task_self(void)
+{
+    return rtos_current_task;
 }
 
 rtos_task_t *rtos_task_at(uint32_t index)
@@ -246,6 +254,7 @@ void rtos_task_delete_self(void)
 {
     rtos_enter_critical();
     rtos_current_task->delay_ticks = 0;
+    rtos_current_task->wait_type = RTOS_WAIT_NONE;
     rtos_current_task->wait_result = RTOS_OK;
     rtos_current_task->state = RTOS_TASK_STOPPED;
     rtos_exit_critical();
@@ -268,6 +277,104 @@ int rtos_idle_set_hook(rtos_idle_hook_t hook, void *arg)
     idle_hook = hook;
     idle_hook_arg = arg;
     rtos_exit_critical();
+
+    return RTOS_OK;
+}
+
+static int notify_common(rtos_task_t *task, uint32_t value)
+{
+    int should_yield = 0;
+
+    if ((task == NULL) || (value == 0U)) {
+        return RTOS_ERR_INVALID;
+    }
+
+    rtos_enter_critical();
+    task->notify_value |= value;
+    task->notify_pending = 1;
+
+    if ((task->state == RTOS_TASK_BLOCKED) &&
+        (task->wait_type == RTOS_WAIT_NOTIFICATION) &&
+        (task->wait_result == RTOS_OK)) {
+        task->delay_ticks = 0;
+        task->wait_result = RTOS_OK;
+        task->state = RTOS_TASK_READY;
+        should_yield = 1;
+    }
+    rtos_exit_critical();
+
+    if (should_yield != 0) {
+        rtos_yield();
+    }
+
+    return RTOS_OK;
+}
+
+int rtos_task_notify(rtos_task_t *task, uint32_t value)
+{
+    return notify_common(task, value);
+}
+
+int rtos_task_notify_isr(rtos_task_t *task, uint32_t value)
+{
+    return notify_common(task, value);
+}
+
+int rtos_task_notify_wait(uint32_t clear_on_entry,
+                          uint32_t clear_on_exit,
+                          uint32_t *value,
+                          uint32_t timeout_ms)
+{
+    rtos_task_t *task = rtos_current_task;
+    uint32_t notified_value;
+
+    rtos_enter_critical();
+    task->notify_value &= ~clear_on_entry;
+
+    if (task->notify_pending != 0U) {
+        notified_value = task->notify_value;
+        task->notify_value &= ~clear_on_exit;
+        if (task->notify_value == 0U) {
+            task->notify_pending = 0;
+        }
+        rtos_exit_critical();
+        if (value != NULL) {
+            *value = notified_value;
+        }
+        return RTOS_OK;
+    }
+
+    if (timeout_ms == 0U) {
+        rtos_exit_critical();
+        return RTOS_ERR_TIMEOUT;
+    }
+
+    task->state = RTOS_TASK_BLOCKED;
+    task->delay_ticks = rtos_ms_to_ticks(timeout_ms);
+    task->wait_type = RTOS_WAIT_NOTIFICATION;
+    task->wait_result = RTOS_OK;
+
+    rtos_exit_critical();
+    rtos_yield();
+
+    rtos_enter_critical();
+    if (task->wait_result == RTOS_ERR_TIMEOUT) {
+        task->wait_type = RTOS_WAIT_NONE;
+        rtos_exit_critical();
+        return RTOS_ERR_TIMEOUT;
+    }
+
+    notified_value = task->notify_value;
+    task->notify_value &= ~clear_on_exit;
+    if (task->notify_value == 0U) {
+        task->notify_pending = 0;
+    }
+    task->wait_type = RTOS_WAIT_NONE;
+    rtos_exit_critical();
+
+    if (value != NULL) {
+        *value = notified_value;
+    }
 
     return RTOS_OK;
 }

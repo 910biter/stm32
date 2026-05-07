@@ -13,6 +13,7 @@ volatile uint32_t app_reuse_count;
 volatile uint32_t app_sched_lock_count;
 volatile uint32_t app_isr_sem_count;
 volatile uint32_t app_idle_hook_count;
+volatile uint32_t app_notify_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
@@ -23,6 +24,7 @@ static rtos_timer_t demo_timer;
 static rtos_event_flags_t demo_events;
 static rtos_mempool_t demo_pool;
 static uint32_t demo_pool_storage[4][4];
+static rtos_task_t *timeout_task_handle;
 
 static void one_shot_task(void *arg);
 
@@ -74,10 +76,14 @@ static void consumer_task(void *arg)
 static void timeout_task(void *arg)
 {
     static uint32_t reuse_created;
+    uint32_t notify_value;
 
     (void)arg;
 
     while (1) {
+        if (timeout_task_handle == 0) {
+            timeout_task_handle = rtos_task_self();
+        }
         if (rtos_sem_wait_timeout(&timeout_sem, 100) == RTOS_ERR_TIMEOUT) {
             app_timeout_count++;
         }
@@ -91,6 +97,11 @@ static void timeout_task(void *arg)
         }
         if (rtos_sem_wait_timeout(&isr_sem, 0) == RTOS_OK) {
             app_isr_sem_count++;
+        }
+        if (rtos_task_notify_wait(0, 0xFFFFFFFFU, &notify_value, 1000) == RTOS_OK) {
+            if ((notify_value & 0x1U) != 0U) {
+                app_notify_count++;
+            }
         }
         if ((app_exit_count != 0U) && (reuse_created == 0U)) {
             if (rtos_task_create_named(one_shot_task, 0, 1, "reuse") == RTOS_OK) {
@@ -113,6 +124,7 @@ static void timer_callback(void *arg)
     if (rtos_in_isr() != 0U) {
         (void)rtos_event_flags_set_isr(&demo_events, 0x1U);
         (void)rtos_sem_post_isr(&isr_sem);
+        (void)rtos_task_notify_isr(timeout_task_handle, 0x1U);
     }
 }
 

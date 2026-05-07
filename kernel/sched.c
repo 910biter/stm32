@@ -80,6 +80,7 @@ void rtos_sleep(uint32_t ms)
 
     rtos_enter_critical();
     rtos_current_task->delay_ticks = ticks;
+    rtos_current_task->wait_type = RTOS_WAIT_SLEEP;
     rtos_current_task->wait_result = RTOS_OK;
     rtos_current_task->state = RTOS_TASK_BLOCKED;
     rtos_exit_critical();

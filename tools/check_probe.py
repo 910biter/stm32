@@ -89,6 +89,7 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_us
         require(errors, counters.get("sched_lock_count", 0) >= 2, "scheduler lock demo did not run enough times")
         require(errors, counters.get("isr_sem_count", 0) >= 2, "ISR semaphore wake demo did not run enough times")
         require(errors, counters.get("idle_hook_count", 0) >= 1000, "idle hook did not run enough times")
+        require(errors, counters.get("notify_count", 0) >= 2, "task notification demo did not run enough times")
         require(errors, counters.get("queue_count", 0) <= 1, "queue retained more than one pending message")
         require(errors, counters.get("timeout_sem_count") == 0, "timeout semaphore unexpectedly has tokens")
         require(errors, (counters.get("event_flags", 0) & ~0x1) == 0, "event flags contain unexpected bits")

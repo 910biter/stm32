@@ -42,6 +42,7 @@ static rtos_task_t *wait_pop(rtos_task_t **head, rtos_task_t **tail)
         task->wait_next = NULL;
 
         if ((task->state == RTOS_TASK_BLOCKED) && (task->wait_result == RTOS_OK)) {
+            task->wait_type = RTOS_WAIT_NONE;
             return task;
         }
     }
@@ -153,6 +154,7 @@ int rtos_mutex_lock_timeout(rtos_mutex_t *mutex, uint32_t timeout_ms)
         task = rtos_current_task;
         task->state = RTOS_TASK_BLOCKED;
         task->delay_ticks = rtos_ms_to_ticks(timeout_ms);
+        task->wait_type = RTOS_WAIT_MUTEX;
         task->wait_result = RTOS_OK;
         wait_push(&mutex->wait_head, &mutex->wait_tail, task);
 
@@ -162,6 +164,7 @@ int rtos_mutex_lock_timeout(rtos_mutex_t *mutex, uint32_t timeout_ms)
         rtos_enter_critical();
         if (task->wait_result == RTOS_ERR_TIMEOUT) {
             wait_remove(&mutex->wait_head, &mutex->wait_tail, task);
+            task->wait_type = RTOS_WAIT_NONE;
             recompute_owner_priority(mutex);
             rtos_exit_critical();
             return RTOS_ERR_TIMEOUT;
@@ -198,6 +201,7 @@ int rtos_mutex_unlock(rtos_mutex_t *mutex)
     task = wait_pop(&mutex->wait_head, &mutex->wait_tail);
     if (task != NULL) {
         task->delay_ticks = 0;
+        task->wait_type = RTOS_WAIT_NONE;
         task->wait_result = RTOS_OK;
         task->state = RTOS_TASK_READY;
         should_yield = 1;

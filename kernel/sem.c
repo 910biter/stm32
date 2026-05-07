@@ -88,6 +88,7 @@ static rtos_task_t *wait_pop(rtos_sem_t *sem)
         task->wait_next = NULL;
 
         if ((task->state == RTOS_TASK_BLOCKED) && (task->wait_result == RTOS_OK)) {
+            task->wait_type = RTOS_WAIT_NONE;
             return task;
         }
     }
@@ -119,6 +120,7 @@ int rtos_sem_wait_timeout(rtos_sem_t *sem, uint32_t timeout_ms)
     task = rtos_current_task;
     task->state = RTOS_TASK_BLOCKED;
     task->delay_ticks = rtos_ms_to_ticks(timeout_ms);
+    task->wait_type = RTOS_WAIT_SEM;
     task->wait_result = RTOS_OK;
     wait_push(sem, task);
 
@@ -128,6 +130,7 @@ int rtos_sem_wait_timeout(rtos_sem_t *sem, uint32_t timeout_ms)
     rtos_enter_critical();
     if (task->wait_result == RTOS_ERR_TIMEOUT) {
         wait_remove(sem, task);
+        task->wait_type = RTOS_WAIT_NONE;
         rtos_exit_critical();
         return RTOS_ERR_TIMEOUT;
     }
@@ -151,6 +154,7 @@ static int post_common(rtos_sem_t *sem)
     task = wait_pop(sem);
     if (task != NULL) {
         task->delay_ticks = 0;
+        task->wait_type = RTOS_WAIT_NONE;
         task->wait_result = RTOS_OK;
         task->state = RTOS_TASK_READY;
         should_yield = 1;

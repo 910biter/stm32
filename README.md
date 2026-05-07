@@ -132,7 +132,8 @@ state, and HardFault state.
 28. Add ISR-safe wake APIs. Done.
 29. Add idle hooks. Done.
 30. Add CPU usage snapshots. Done.
-31. Add task notifications.
+31. Add task notifications. Done.
+32. Add deferred interrupt work.
 
 ## Typical edit loop
 

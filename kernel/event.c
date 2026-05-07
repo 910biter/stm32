@@ -121,6 +121,7 @@ static int set_common(rtos_event_flags_t *events, uint32_t flags)
             scan->wait_next = NULL;
             scan->wait_flags_result = matched;
             scan->delay_ticks = 0;
+            scan->wait_type = RTOS_WAIT_NONE;
             scan->wait_result = RTOS_OK;
             scan->state = RTOS_TASK_READY;
             should_yield = 1;
@@ -202,6 +203,7 @@ int rtos_event_flags_wait(rtos_event_flags_t *events,
     task = rtos_current_task;
     task->state = RTOS_TASK_BLOCKED;
     task->delay_ticks = rtos_ms_to_ticks(timeout_ms);
+    task->wait_type = RTOS_WAIT_EVENT;
     task->wait_result = RTOS_OK;
     task->wait_flags = flags;
     task->wait_flags_result = 0;
@@ -215,6 +217,7 @@ int rtos_event_flags_wait(rtos_event_flags_t *events,
     rtos_enter_critical();
     if (task->wait_result == RTOS_ERR_TIMEOUT) {
         wait_remove(events, task);
+        task->wait_type = RTOS_WAIT_NONE;
         rtos_exit_critical();
         return RTOS_ERR_TIMEOUT;
     }

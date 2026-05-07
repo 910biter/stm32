@@ -42,6 +42,7 @@ static rtos_task_t *wait_pop(rtos_task_t **head, rtos_task_t **tail)
         task->wait_next = NULL;
 
         if ((task->state == RTOS_TASK_BLOCKED) && (task->wait_result == RTOS_OK)) {
+            task->wait_type = RTOS_WAIT_NONE;
             return task;
         }
     }
@@ -79,6 +80,7 @@ static void wake_task(rtos_task_t *task)
 {
     if (task != NULL) {
         task->delay_ticks = 0;
+        task->wait_type = RTOS_WAIT_NONE;
         task->wait_result = RTOS_OK;
         task->state = RTOS_TASK_READY;
     }
@@ -155,6 +157,7 @@ int rtos_queue_send_timeout(rtos_queue_t *queue, uint32_t value, uint32_t timeou
         task = rtos_current_task;
         task->state = RTOS_TASK_BLOCKED;
         task->delay_ticks = rtos_ms_to_ticks(timeout_ms);
+        task->wait_type = RTOS_WAIT_QUEUE;
         task->wait_result = RTOS_OK;
         wait_push(&queue->send_wait_head, &queue->send_wait_tail, task);
 
@@ -164,6 +167,7 @@ int rtos_queue_send_timeout(rtos_queue_t *queue, uint32_t value, uint32_t timeou
         rtos_enter_critical();
         if (task->wait_result == RTOS_ERR_TIMEOUT) {
             wait_remove(&queue->send_wait_head, &queue->send_wait_tail, task);
+            task->wait_type = RTOS_WAIT_NONE;
             rtos_exit_critical();
             return RTOS_ERR_TIMEOUT;
         }
@@ -218,6 +222,7 @@ int rtos_queue_recv_timeout(rtos_queue_t *queue, uint32_t *value, uint32_t timeo
         task = rtos_current_task;
         task->state = RTOS_TASK_BLOCKED;
         task->delay_ticks = rtos_ms_to_ticks(timeout_ms);
+        task->wait_type = RTOS_WAIT_QUEUE;
         task->wait_result = RTOS_OK;
         wait_push(&queue->recv_wait_head, &queue->recv_wait_tail, task);
 
@@ -227,6 +232,7 @@ int rtos_queue_recv_timeout(rtos_queue_t *queue, uint32_t *value, uint32_t timeo
         rtos_enter_critical();
         if (task->wait_result == RTOS_ERR_TIMEOUT) {
             wait_remove(&queue->recv_wait_head, &queue->recv_wait_tail, task);
+            task->wait_type = RTOS_WAIT_NONE;
             rtos_exit_critical();
             return RTOS_ERR_TIMEOUT;
         }

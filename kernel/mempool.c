@@ -74,6 +74,7 @@ static rtos_task_t *wait_pop(rtos_mempool_t *pool)
         task->wait_next = NULL;
 
         if ((task->state == RTOS_TASK_BLOCKED) && (task->wait_result == RTOS_OK)) {
+            task->wait_type = RTOS_WAIT_NONE;
             return task;
         }
     }
@@ -156,6 +157,7 @@ void *rtos_mempool_alloc_timeout(rtos_mempool_t *pool, uint32_t timeout_ms)
         task = rtos_current_task;
         task->state = RTOS_TASK_BLOCKED;
         task->delay_ticks = rtos_ms_to_ticks(timeout_ms);
+        task->wait_type = RTOS_WAIT_MEMPOOL;
         task->wait_result = RTOS_OK;
         task->wait_object_result = NULL;
         wait_push(pool, task);
@@ -166,6 +168,7 @@ void *rtos_mempool_alloc_timeout(rtos_mempool_t *pool, uint32_t timeout_ms)
         rtos_enter_critical();
         if (task->wait_result == RTOS_ERR_TIMEOUT) {
             wait_remove(pool, task);
+            task->wait_type = RTOS_WAIT_NONE;
             rtos_exit_critical();
             return NULL;
         }
@@ -194,6 +197,7 @@ int rtos_mempool_free(rtos_mempool_t *pool, void *block)
     if (task != NULL) {
         task->wait_object_result = block;
         task->delay_ticks = 0;
+        task->wait_type = RTOS_WAIT_NONE;
         task->wait_result = RTOS_OK;
         task->state = RTOS_TASK_READY;
         should_yield = 1;

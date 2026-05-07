@@ -61,6 +61,7 @@ def main():
         "app_sched_lock_count",
         "app_isr_sem_count",
         "app_idle_hook_count",
+        "app_notify_count",
     ]
 
     print("init")
@@ -84,7 +85,7 @@ def main():
     emit_mem("scheduler_state", symbol(symbols, "rtos_scheduler_lock_count"), 2)
     emit_mem("fault_info", symbol(symbols, "rtos_fault_info"), 17)
 
-    print('echo [format "task counters: produced=%u consumed=%u boost_count=%u timeout_count=%u timer_count=%u event_count=%u pool_count=%u exit_count=%u reuse_count=%u sched_lock_count=%u isr_sem_count=%u idle_hook_count=%u queue_count=%u timeout_sem_count=%u event_flags=0x%08x pool_free=%u mutex_owner=0x%08x mutex_lock_count=%u tick=%u critical_nesting=%u saved_primask=%u scheduler_lock=%u scheduler_pending=%u snapshot_count=%u" $counters(0) $counters(1) $counters(2) $counters(3) $counters(4) $counters(5) $counters(6) $counters(7) $counters(8) $counters(9) $counters(10) $counters(11) $queue_state(2) $sem_state(0) $event_state(0) $pool_state(4) $mutex_state(0) $mutex_state(1) $tick_state(0) $kernel_state(0) $kernel_state(1) $scheduler_state(0) $scheduler_state(1) $debug_count(0)]')
+    print('echo [format "task counters: produced=%u consumed=%u boost_count=%u timeout_count=%u timer_count=%u event_count=%u pool_count=%u exit_count=%u reuse_count=%u sched_lock_count=%u isr_sem_count=%u idle_hook_count=%u notify_count=%u queue_count=%u timeout_sem_count=%u event_flags=0x%08x pool_free=%u mutex_owner=0x%08x mutex_lock_count=%u tick=%u critical_nesting=%u saved_primask=%u scheduler_lock=%u scheduler_pending=%u snapshot_count=%u" $counters(0) $counters(1) $counters(2) $counters(3) $counters(4) $counters(5) $counters(6) $counters(7) $counters(8) $counters(9) $counters(10) $counters(11) $counters(12) $queue_state(2) $sem_state(0) $event_state(0) $pool_state(4) $mutex_state(0) $mutex_state(1) $tick_state(0) $kernel_state(0) $kernel_state(1) $scheduler_state(0) $scheduler_state(1) $debug_count(0)]')
 
     for task_index in range(max_tasks):
         base = task_index * SNAPSHOT_WORDS

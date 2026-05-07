@@ -62,7 +62,8 @@ for the NUCLEO-F446RE board.
 29. Add ISR-safe wake APIs. Done.
 30. Add idle hooks. Done.
 31. Add CPU usage snapshots. Done.
-32. Add task notifications.
+32. Add task notifications. Done.
+33. Add deferred interrupt work.
 
 ## Cortex-M context switch model
 
@@ -230,3 +231,11 @@ snapshot refreshes from each task's accumulated `run_ticks`, giving OpenOCD a
 quick tick-sampled view of whether the system is mostly idle or busy. Very
 short tasks can finish between SysTick interrupts, so this is a coarse system
 health metric rather than a cycle-accurate profiler.
+
+Task notifications provide a lightweight per-task signaling path. Each TCB owns
+a pending flag and a 32-bit notification value. `rtos_task_notify()` and
+`rtos_task_notify_isr()` OR bits into the target task, while
+`rtos_task_notify_wait()` lets the current task consume the value or block with
+a timeout. Notification wakeups check the task's wait type, so they do not
+accidentally release tasks blocked on semaphores, queues, mutexes, events, or
+memory pools.
