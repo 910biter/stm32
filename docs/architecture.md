@@ -66,7 +66,7 @@ for the NUCLEO-F446RE board.
 33. Add deferred interrupt work. Done.
 34. Add trace ring buffer. Done.
 35. Add kernel API cleanup docs. Done.
-36. Final validation and demo polish.
+36. Final validation and demo polish. Done.
 
 ## Cortex-M context switch model
 
@@ -260,3 +260,8 @@ task creation, scheduler locking, synchronization objects, ISR-safe calls, task
 notifications, timers, deferred work, and debug/probe helpers. This keeps the
 learning path separate from the implementation details in this architecture
 document.
+
+Final validation is captured by `make validate`, which performs a clean build,
+flashes the board, generates the symbol-based OpenOCD probe script, and checks
+the SRAM debug records. This is the command to run after meaningful kernel
+changes.

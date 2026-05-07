@@ -89,6 +89,14 @@ This captures the same OpenOCD probe output in `build/probe.log` and checks the
 demo counters, task snapshots, kernel object registry, stack guards, assertion
 state, and HardFault state.
 
+For the full board validation loop, run:
+
+```sh
+make validate
+```
+
+This cleans, rebuilds, flashes, and runs the automated probe checks.
+
 ## Bare-metal structure
 
 - `app/main.c` contains the current blink application.
@@ -137,12 +145,10 @@ state, and HardFault state.
 32. Add deferred interrupt work. Done.
 33. Add trace ring buffer. Done.
 34. Add kernel API cleanup docs. Done.
-35. Final validation and demo polish.
+35. Final validation and demo polish. Done.
 
 ## Typical edit loop
 
 1. Change code under `app/`, `board/`, `kernel/`, or `port/`.
-2. Run `make`.
-3. Run `make flash`.
-4. Run `make check-probe`.
-5. For debugging, keep `make openocd` running and attach with `make debug`.
+2. Run `make validate`.
+3. For debugging, keep `make openocd` running and attach with `make debug`.

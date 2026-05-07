@@ -46,7 +46,7 @@ ASM_SOURCES := \
 OBJECTS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
 OBJECTS += $(ASM_SOURCES:%.S=$(BUILD_DIR)/%.o)
 
-.PHONY: all clean flash debug openocd probe probe-script check-probe
+.PHONY: all clean flash debug openocd probe probe-script check-probe validate
 
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
 
@@ -85,6 +85,12 @@ probe: $(PROBE_SCRIPT)
 check-probe: $(PROBE_SCRIPT)
 	bash -o pipefail -c '$(OPENOCD) -f openocd.cfg -f $(PROBE_SCRIPT) 2>&1 | tee $(PROBE_LOG)'
 	$(PYTHON) tools/check_probe.py $(PROBE_LOG)
+
+validate:
+	$(MAKE) clean
+	$(MAKE) all
+	$(MAKE) flash
+	$(MAKE) check-probe
 
 debug: all
 	$(GDB) $(BUILD_DIR)/$(TARGET).elf -ex "target extended-remote localhost:3333"

@@ -79,13 +79,11 @@ doing follow-up processing.
 The normal board-side validation loop is:
 
 ```sh
-make clean
-make
-make flash
-make check-probe
+make validate
 ```
 
-`make check-probe` generates an OpenOCD script from the ELF symbol table, lets
-the firmware run, captures SRAM debug state, and validates the demo counters,
-task snapshots, object registry, CPU usage snapshot, trace ring, assertions,
-and HardFault record.
+`make validate` cleans, rebuilds, flashes, and then runs `make check-probe`.
+The probe step generates an OpenOCD script from the ELF symbol table, lets the
+firmware run, captures SRAM debug state, and validates the demo counters, task
+snapshots, object registry, CPU usage snapshot, trace ring, assertions, and
+HardFault record.
