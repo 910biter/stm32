@@ -79,6 +79,16 @@ with a 100 ms timeout so timeout wakeups are visible in SRAM. The debug
 snapshots include each task's TCB pointer, PSP, stack base, stack use estimate,
 delay, state, wait result, and effective priority.
 
+For a pass/fail hardware smoke test, run:
+
+```sh
+make check-probe
+```
+
+This captures the same OpenOCD probe output in `build/probe.log` and checks the
+demo counters, task snapshots, stack guards, assertion state, and HardFault
+state.
+
 ## Bare-metal structure
 
 - `app/main.c` contains the current blink application.
@@ -116,11 +126,13 @@ delay, state, wait result, and effective priority.
 22. Add priority-aware wait queues. Done.
 23. Add per-task statistics. Done.
 24. Add probe symbol generation. Done.
-25. Add automated probe checks.
+25. Add automated probe checks. Done.
+26. Add kernel object registry.
 
 ## Typical edit loop
 
 1. Change code under `app/`, `board/`, `kernel/`, or `port/`.
 2. Run `make`.
 3. Run `make flash`.
-4. For debugging, keep `make openocd` running and attach with `make debug`.
+4. Run `make check-probe`.
+5. For debugging, keep `make openocd` running and attach with `make debug`.

@@ -56,7 +56,8 @@ for the NUCLEO-F446RE board.
 23. Add priority-aware wait queues. Done.
 24. Add per-task statistics. Done.
 25. Add probe symbol generation. Done.
-26. Add automated probe checks.
+26. Add automated probe checks. Done.
+27. Add kernel object registry.
 
 ## Cortex-M context switch model
 
@@ -189,3 +190,8 @@ The OpenOCD probe script is generated from the ELF symbol table. `make probe`
 builds the firmware, runs `tools/gen_probe.py`, and uses the generated script
 under `build/`. This removes the brittle hand-maintained SRAM addresses from
 the normal debug loop when `.bss` layout changes.
+
+Automated probe checks turn that debug output into a hardware smoke test.
+`make check-probe` records the OpenOCD output in `build/probe.log`, then
+`tools/check_probe.py` verifies that the demo tasks made progress, stack guards
+are intact, and neither runtime assertions nor HardFault diagnostics are active.
