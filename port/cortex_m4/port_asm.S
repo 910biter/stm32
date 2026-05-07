@@ -1,8 +1,19 @@
     .syntax unified
     .thumb
 
+    .extern port_hardfault_handler_c
     .extern rtos_current_task
     .extern rtos_schedule_next
+
+    .global HardFault_Handler
+    .type HardFault_Handler, %function
+HardFault_Handler:
+    tst lr, #4
+    ite eq
+    mrseq r0, msp
+    mrsne r0, psp
+    mov r1, lr
+    b port_hardfault_handler_c
 
     .global port_start_first_task
     .type port_start_first_task, %function

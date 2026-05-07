@@ -27,6 +27,7 @@ C_SOURCES := \
 	kernel/task.c \
 	kernel/tick.c \
 	port/cortex_m4/port.c \
+	port/cortex_m4/fault.c \
 	startup/startup_stm32f4.c
 
 ASM_SOURCES := \

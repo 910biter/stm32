@@ -103,7 +103,8 @@ priority.
 10. Add mutex priority inheritance. Done.
 11. Add debug task listing. Done.
 12. Add an SVC-based scheduler start path. Done.
-13. Add basic fault diagnostics.
+13. Add basic fault diagnostics. Done.
+14. Add timeouts for blocking primitives.
 
 ## Typical edit loop
 

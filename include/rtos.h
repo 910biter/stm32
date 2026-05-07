@@ -2,6 +2,7 @@
 #define RTOS_H
 
 #include "rtos_debug.h"
+#include "rtos_fault.h"
 #include "rtos_mutex.h"
 #include "rtos_queue.h"
 #include "rtos_sem.h"

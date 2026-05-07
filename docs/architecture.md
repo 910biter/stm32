@@ -44,7 +44,8 @@ for the NUCLEO-F446RE board.
 11. Add mutex priority inheritance. Done.
 12. Add debug task listing. Done.
 13. Add an SVC-based scheduler start path. Done.
-14. Add basic fault diagnostics.
+14. Add basic fault diagnostics. Done.
+15. Add timeouts for blocking primitives.
 
 ## Cortex-M context switch model
 
@@ -106,3 +107,9 @@ UART. Each task carries an optional name pointer, and each stack is filled with
 `0xA5A5A5A5` before the initial exception frame is built. The debug module scans
 for the first overwritten word to estimate stack use, then publishes a fixed
 array of snapshots that OpenOCD can read from SRAM.
+
+HardFault diagnostics are captured in `rtos_fault_info`. The assembly wrapper
+selects MSP or PSP from the exception return value, then the C handler records
+the stacked core registers plus CFSR, HFSR, DFSR, AFSR, BFAR, and MMFAR before
+parking the CPU. This gives OpenOCD a stable SRAM record to inspect after a
+crash.
