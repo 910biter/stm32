@@ -59,6 +59,7 @@ int rtos_task_create(rtos_task_entry_t entry, void *arg)
     task->stack_words = RTOS_TASK_STACK_WORDS;
     task->delay_ticks = 0;
     task->state = RTOS_TASK_READY;
+    task->wait_next = NULL;
 
     if (task_count == 0U) {
         task->next = task;

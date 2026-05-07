@@ -1,6 +1,7 @@
 #ifndef RTOS_H
 #define RTOS_H
 
+#include "rtos_sem.h"
 #include "rtos_task.h"
 
 int rtos_task_create(rtos_task_entry_t entry, void *arg);

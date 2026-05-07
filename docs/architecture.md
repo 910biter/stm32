@@ -37,7 +37,8 @@ for the NUCLEO-F446RE board.
 4. Add SysTick and round-robin preemption. Done.
 5. Add `rtos_sleep()` so tasks block instead of spinning. Done.
 6. Add nested critical sections. Done.
-7. Add basic synchronization primitives.
+7. Add counting semaphores. Done.
+8. Add queues, priority scheduling, mutexes, and debug task listing.
 
 ## Cortex-M context switch model
 
@@ -66,3 +67,8 @@ Critical sections are exposed as `rtos_enter_critical()` and
 `rtos_exit_critical()`. The Cortex-M4 port saves the outermost PRIMASK value,
 disables interrupts, tracks nested entries, and restores the saved PRIMASK only
 when the final nested critical section exits.
+
+Counting semaphores are exposed as `rtos_sem_t`. A wait with no available count
+blocks the current task and links it onto the semaphore wait FIFO. Posting wakes
+the oldest waiting task, or increments the count up to `max_count` when no task
+is waiting.

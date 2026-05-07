@@ -20,6 +20,7 @@ C_SOURCES := \
 	kernel/critical.c \
 	kernel/list.c \
 	kernel/sched.c \
+	kernel/sem.c \
 	kernel/task.c \
 	kernel/tick.c \
 	port/cortex_m4/port.c \

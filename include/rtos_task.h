@@ -18,6 +18,7 @@ typedef struct rtos_task {
     uint32_t delay_ticks;
     rtos_task_state_t state;
     struct rtos_task *next;
+    struct rtos_task *wait_next;
 } rtos_task_t;
 
 extern rtos_task_t *rtos_current_task;
