@@ -9,6 +9,7 @@ volatile uint32_t app_timer_count;
 volatile uint32_t app_event_count;
 volatile uint32_t app_pool_count;
 volatile uint32_t app_exit_count;
+volatile uint32_t app_reuse_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
@@ -18,6 +19,8 @@ static rtos_timer_t demo_timer;
 static rtos_event_flags_t demo_events;
 static rtos_mempool_t demo_pool;
 static uint32_t demo_pool_storage[4][4];
+
+static void one_shot_task(void *arg);
 
 static void producer_task(void *arg)
 {
@@ -59,6 +62,8 @@ static void consumer_task(void *arg)
 
 static void timeout_task(void *arg)
 {
+    static uint32_t reuse_created;
+
     (void)arg;
 
     while (1) {
@@ -72,6 +77,11 @@ static void timeout_task(void *arg)
         if (block != 0) {
             app_pool_count++;
             (void)rtos_mempool_free(&demo_pool, block);
+        }
+        if ((app_exit_count != 0U) && (reuse_created == 0U)) {
+            if (rtos_task_create_named(one_shot_task, 0, 1, "reuse") == RTOS_OK) {
+                reuse_created = 1;
+            }
         }
         rtos_sleep(50);
     }
@@ -89,7 +99,11 @@ static void one_shot_task(void *arg)
 {
     (void)arg;
 
-    app_exit_count++;
+    if (app_exit_count == 0U) {
+        app_exit_count++;
+    } else {
+        app_reuse_count++;
+    }
 }
 
 int main(void)

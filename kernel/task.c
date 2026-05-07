@@ -29,14 +29,43 @@ static uint32_t *align_stack(uint32_t *sp)
     return (uint32_t *)((uintptr_t)sp & ~((uintptr_t)0x7U));
 }
 
+static rtos_task_t *find_task_slot(uint32_t *slot_index, int *is_new_slot)
+{
+    if (task_count < RTOS_MAX_TASKS) {
+        *slot_index = task_count;
+        *is_new_slot = 1;
+        task_count++;
+        return &tasks[*slot_index];
+    }
+
+    for (uint32_t i = 0; i < task_count; ++i) {
+        if (tasks[i].state == RTOS_TASK_STOPPED) {
+            *slot_index = i;
+            *is_new_slot = 0;
+            return &tasks[i];
+        }
+    }
+
+    return NULL;
+}
+
 int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority, const char *name)
 {
-    if ((entry == NULL) || (task_count >= RTOS_MAX_TASKS)) {
+    uint32_t slot_index;
+    int is_new_slot;
+
+    if (entry == NULL) {
         return -1;
     }
 
-    rtos_task_t *task = &tasks[task_count];
-    uint32_t *stack = task_stacks[task_count];
+    rtos_enter_critical();
+    rtos_task_t *task = find_task_slot(&slot_index, &is_new_slot);
+    if (task == NULL) {
+        rtos_exit_critical();
+        return -1;
+    }
+
+    uint32_t *stack = task_stacks[slot_index];
     uint32_t *sp = align_stack(stack + RTOS_TASK_STACK_WORDS);
 
     RTOS_ASSERT((((uintptr_t)sp) & 0x7U) == 0U);
@@ -73,16 +102,23 @@ int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority
     task->state = RTOS_TASK_READY;
     task->wait_next = NULL;
     task->wait_result = RTOS_OK;
+    task->wait_flags = 0;
+    task->wait_flags_result = 0;
+    task->wait_flags_all = 0;
+    task->wait_flags_clear = 0;
+    task->wait_object_result = NULL;
 
-    if (task_count == 0U) {
-        task->next = task;
-        rtos_current_task = task;
-    } else {
-        task->next = rtos_current_task->next;
-        rtos_current_task->next = task;
+    if (is_new_slot != 0) {
+        if (task_count == 1U) {
+            task->next = task;
+            rtos_current_task = task;
+        } else {
+            task->next = rtos_current_task->next;
+            rtos_current_task->next = task;
+        }
     }
 
-    task_count++;
+    rtos_exit_critical();
     return 0;
 }
 

@@ -2,19 +2,19 @@ init
 reset run
 sleep 2000
 halt
-mem2array counters 32 0x20000000 8
-mem2array queue_state 32 0x20000020 5
-mem2array mutex_state 32 0x20000054 2
-mem2array sem_state 32 0x20000064 4
-mem2array event_state 32 0x20000094 3
-mem2array pool_state 32 0x200000a0 7
-mem2array debug_count 32 0x200000fc 1
-mem2array snapshots 32 0x20000100 60
-mem2array tick_state 32 0x20000d3c 1
-mem2array assert_info 32 0x20000d48 6
-mem2array kernel_state 32 0x20000d60 2
-mem2array fault_info 32 0x20000d68 17
-echo [format "task counters: produced=%u consumed=%u boost_count=%u timeout_count=%u timer_count=%u event_count=%u pool_count=%u exit_count=%u queue_count=%u timeout_sem_count=%u event_flags=0x%08x pool_free=%u mutex_owner=0x%08x mutex_lock_count=%u tick=%u critical_nesting=%u saved_primask=%u snapshot_count=%u" $counters(0) $counters(1) $counters(2) $counters(3) $counters(4) $counters(5) $counters(6) $counters(7) $queue_state(2) $sem_state(0) $event_state(0) $pool_state(4) $mutex_state(0) $mutex_state(1) $tick_state(0) $kernel_state(0) $kernel_state(1) $debug_count(0)]
+mem2array counters 32 0x20000000 9
+mem2array queue_state 32 0x20000024 5
+mem2array mutex_state 32 0x20000058 2
+mem2array sem_state 32 0x20000068 4
+mem2array event_state 32 0x20000098 3
+mem2array pool_state 32 0x200000a4 7
+mem2array debug_count 32 0x20000104 1
+mem2array snapshots 32 0x20000108 60
+mem2array tick_state 32 0x20000d44 1
+mem2array assert_info 32 0x20000d50 6
+mem2array kernel_state 32 0x20000d68 2
+mem2array fault_info 32 0x20000d70 17
+echo [format "task counters: produced=%u consumed=%u boost_count=%u timeout_count=%u timer_count=%u event_count=%u pool_count=%u exit_count=%u reuse_count=%u queue_count=%u timeout_sem_count=%u event_flags=0x%08x pool_free=%u mutex_owner=0x%08x mutex_lock_count=%u tick=%u critical_nesting=%u saved_primask=%u snapshot_count=%u" $counters(0) $counters(1) $counters(2) $counters(3) $counters(4) $counters(5) $counters(6) $counters(7) $counters(8) $queue_state(2) $sem_state(0) $event_state(0) $pool_state(4) $mutex_state(0) $mutex_state(1) $tick_state(0) $kernel_state(0) $kernel_state(1) $debug_count(0)]
 echo [format "task0: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d guard=%u" $snapshots(0) $snapshots(1) $snapshots(2) $snapshots(3) $snapshots(4) $snapshots(5) $snapshots(6) $snapshots(7) $snapshots(8) $snapshots(9) $snapshots(10) $snapshots(11)]
 echo [format "task1: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d guard=%u" $snapshots(12) $snapshots(13) $snapshots(14) $snapshots(15) $snapshots(16) $snapshots(17) $snapshots(18) $snapshots(19) $snapshots(20) $snapshots(21) $snapshots(22) $snapshots(23)]
 echo [format "task2: name=0x%08x tcb=0x%08x sp=0x%08x stack=0x%08x words=%u used=%u delay=%u base=%u effective=%u state=%u wait=%d guard=%u" $snapshots(24) $snapshots(25) $snapshots(26) $snapshots(27) $snapshots(28) $snapshots(29) $snapshots(30) $snapshots(31) $snapshots(32) $snapshots(33) $snapshots(34) $snapshots(35)]

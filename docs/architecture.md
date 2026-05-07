@@ -52,7 +52,8 @@ for the NUCLEO-F446RE board.
 19. Add event flags. Done.
 20. Add memory pools. Done.
 21. Add task lifecycle management. Done.
-22. Add task slot reuse.
+22. Add task slot reuse. Done.
+23. Add priority-aware wait queues.
 
 ## Cortex-M context switch model
 
@@ -163,3 +164,9 @@ Task lifecycle management adds a `STOPPED` task state. A task that returns from
 its entry function reaches `rtos_task_exit()`, marks itself stopped, and yields.
 The scheduler skips stopped tasks. This first lifecycle step does not reclaim
 the task slot or stack yet; it only makes task completion explicit and safe.
+
+Task slot reuse lets `rtos_task_create_named()` recycle a stopped task control
+block and its stack once the fixed task table is full. Reused tasks stay in the
+same circular scheduler list, so creation only rebuilds the initial stack frame
+and marks the task ready again. This keeps allocation static while allowing
+short-lived tasks to be relaunched.
