@@ -13,6 +13,7 @@
 #include "rtos_status.h"
 #include "rtos_task.h"
 #include "rtos_timer.h"
+#include "rtos_work.h"
 
 int rtos_task_create(rtos_task_entry_t entry, void *arg);
 int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t priority);

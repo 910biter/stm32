@@ -51,6 +51,11 @@ typedef struct rtos_task {
 extern rtos_task_t *rtos_current_task;
 
 int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority, const char *name);
+int rtos_task_create_named_handle(rtos_task_entry_t entry,
+                                  void *arg,
+                                  uint32_t priority,
+                                  const char *name,
+                                  rtos_task_t **task_out);
 int rtos_create_idle_task(void);
 uint32_t rtos_task_count(void);
 rtos_task_t *rtos_task_at(uint32_t index);

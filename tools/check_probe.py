@@ -90,6 +90,9 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_us
         require(errors, counters.get("isr_sem_count", 0) >= 2, "ISR semaphore wake demo did not run enough times")
         require(errors, counters.get("idle_hook_count", 0) >= 1000, "idle hook did not run enough times")
         require(errors, counters.get("notify_count", 0) >= 2, "task notification demo did not run enough times")
+        require(errors, counters.get("deferred_count", 0) >= 2, "deferred work demo did not run enough times")
+        require(errors, counters.get("work_pending") == 0, "deferred work queue still has pending items")
+        require(errors, counters.get("work_drops") == 0, "deferred work queue dropped items")
         require(errors, counters.get("queue_count", 0) <= 1, "queue retained more than one pending message")
         require(errors, counters.get("timeout_sem_count") == 0, "timeout semaphore unexpectedly has tokens")
         require(errors, (counters.get("event_flags", 0) & ~0x1) == 0, "event flags contain unexpected bits")
@@ -111,7 +114,7 @@ def check_probe(counters, tasks, assertion, fault, object_count, objects, cpu_us
         require(errors, fault.get("active") == 0, "HardFault diagnostics are active")
 
     if tasks:
-        require(errors, len(tasks) >= 5, "expected at least five task snapshots")
+        require(errors, len(tasks) >= 6, "expected at least six task snapshots")
         require(errors, any(task.get("state") == 3 for task in tasks.values()), "no stopped task was observed")
         require(errors, any(task.get("run_ticks", 0) >= 1000 for task in tasks.values()), "no task accumulated run ticks")
         for index, task in sorted(tasks.items()):

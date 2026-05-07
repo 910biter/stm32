@@ -54,7 +54,11 @@ static rtos_task_t *find_task_slot(uint32_t *slot_index, int *is_new_slot)
     return NULL;
 }
 
-int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority, const char *name)
+int rtos_task_create_named_handle(rtos_task_entry_t entry,
+                                  void *arg,
+                                  uint32_t priority,
+                                  const char *name,
+                                  rtos_task_t **task_out)
 {
     uint32_t slot_index;
     int is_new_slot;
@@ -128,8 +132,17 @@ int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority
         }
     }
 
+    if (task_out != NULL) {
+        *task_out = task;
+    }
+
     rtos_exit_critical();
     return 0;
+}
+
+int rtos_task_create_named(rtos_task_entry_t entry, void *arg, uint32_t priority, const char *name)
+{
+    return rtos_task_create_named_handle(entry, arg, priority, name, NULL);
 }
 
 int rtos_task_create_with_priority(rtos_task_entry_t entry, void *arg, uint32_t priority)

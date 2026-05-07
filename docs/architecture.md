@@ -63,7 +63,8 @@ for the NUCLEO-F446RE board.
 30. Add idle hooks. Done.
 31. Add CPU usage snapshots. Done.
 32. Add task notifications. Done.
-33. Add deferred interrupt work.
+33. Add deferred interrupt work. Done.
+34. Add trace ring buffer.
 
 ## Cortex-M context switch model
 
@@ -239,3 +240,9 @@ a pending flag and a 32-bit notification value. `rtos_task_notify()` and
 a timeout. Notification wakeups check the task's wait type, so they do not
 accidentally release tasks blocked on semaphores, queues, mutexes, events, or
 memory pools.
+
+Deferred interrupt work adds a fixed-size work queue and an internal worker
+task. ISRs can call `rtos_work_submit_isr()` to enqueue a callback, then return
+quickly. The worker task consumes pending work in Thread mode, making it the
+right place for follow-up code that is too expensive or too stateful for an
+interrupt handler.

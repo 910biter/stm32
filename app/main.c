@@ -14,6 +14,7 @@ volatile uint32_t app_sched_lock_count;
 volatile uint32_t app_isr_sem_count;
 volatile uint32_t app_idle_hook_count;
 volatile uint32_t app_notify_count;
+volatile uint32_t app_deferred_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
@@ -33,6 +34,13 @@ static void idle_hook(void *arg)
     (void)arg;
 
     app_idle_hook_count++;
+}
+
+static void deferred_callback(void *arg)
+{
+    (void)arg;
+
+    app_deferred_count++;
 }
 
 static void producer_task(void *arg)
@@ -125,6 +133,7 @@ static void timer_callback(void *arg)
         (void)rtos_event_flags_set_isr(&demo_events, 0x1U);
         (void)rtos_sem_post_isr(&isr_sem);
         (void)rtos_task_notify_isr(timeout_task_handle, 0x1U);
+        (void)rtos_work_submit_isr(deferred_callback, 0);
     }
 }
 
@@ -158,6 +167,7 @@ int main(void)
     (void)rtos_object_set_name(&demo_pool, "demo_pool");
     (void)rtos_object_set_name(&demo_timer, "demo_timer");
     (void)rtos_idle_set_hook(idle_hook, 0);
+    (void)rtos_work_init();
     (void)rtos_timer_start(&demo_timer);
     (void)rtos_task_create_named(producer_task, 0, 1, "producer");
     (void)rtos_task_create_named(consumer_task, 0, 2, "consumer");

@@ -133,7 +133,8 @@ state, and HardFault state.
 29. Add idle hooks. Done.
 30. Add CPU usage snapshots. Done.
 31. Add task notifications. Done.
-32. Add deferred interrupt work.
+32. Add deferred interrupt work. Done.
+33. Add trace ring buffer.
 
 ## Typical edit loop
 
