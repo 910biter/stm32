@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 typedef void (*rtos_task_entry_t)(void *arg);
+typedef void (*rtos_idle_hook_t)(void *arg);
 
 typedef enum {
     RTOS_TASK_READY = 0,
@@ -47,5 +48,6 @@ void rtos_task_tick(void);
 void rtos_task_account_tick(void);
 void rtos_task_delete_self(void);
 void rtos_task_exit(void);
+int rtos_idle_set_hook(rtos_idle_hook_t hook, void *arg);
 
 #endif

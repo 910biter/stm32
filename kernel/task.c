@@ -12,6 +12,8 @@ static rtos_task_t tasks[RTOS_MAX_TASKS];
 static uint32_t task_stacks[RTOS_MAX_TASKS][RTOS_TASK_STACK_WORDS];
 static uint32_t task_count;
 static uint32_t stack_guard_check_index;
+static rtos_idle_hook_t idle_hook;
+static void *idle_hook_arg;
 
 rtos_task_t *rtos_current_task;
 
@@ -20,6 +22,9 @@ static void idle_task(void *arg)
     (void)arg;
 
     while (1) {
+        if (idle_hook != NULL) {
+            idle_hook(idle_hook_arg);
+        }
         __asm volatile ("wfi");
     }
 }
@@ -255,4 +260,14 @@ void rtos_task_delete_self(void)
 void rtos_task_exit(void)
 {
     rtos_task_delete_self();
+}
+
+int rtos_idle_set_hook(rtos_idle_hook_t hook, void *arg)
+{
+    rtos_enter_critical();
+    idle_hook = hook;
+    idle_hook_arg = arg;
+    rtos_exit_critical();
+
+    return RTOS_OK;
 }

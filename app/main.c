@@ -12,6 +12,7 @@ volatile uint32_t app_exit_count;
 volatile uint32_t app_reuse_count;
 volatile uint32_t app_sched_lock_count;
 volatile uint32_t app_isr_sem_count;
+volatile uint32_t app_idle_hook_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
@@ -24,6 +25,13 @@ static rtos_mempool_t demo_pool;
 static uint32_t demo_pool_storage[4][4];
 
 static void one_shot_task(void *arg);
+
+static void idle_hook(void *arg)
+{
+    (void)arg;
+
+    app_idle_hook_count++;
+}
 
 static void producer_task(void *arg)
 {
@@ -137,6 +145,7 @@ int main(void)
     (void)rtos_object_set_name(&demo_events, "demo_events");
     (void)rtos_object_set_name(&demo_pool, "demo_pool");
     (void)rtos_object_set_name(&demo_timer, "demo_timer");
+    (void)rtos_idle_set_hook(idle_hook, 0);
     (void)rtos_timer_start(&demo_timer);
     (void)rtos_task_create_named(producer_task, 0, 1, "producer");
     (void)rtos_task_create_named(consumer_task, 0, 2, "consumer");

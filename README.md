@@ -130,7 +130,8 @@ state, and HardFault state.
 26. Add kernel object registry. Done.
 27. Add scheduler lock. Done.
 28. Add ISR-safe wake APIs. Done.
-29. Add idle hooks.
+29. Add idle hooks. Done.
+30. Add CPU usage snapshots.
 
 ## Typical edit loop
 

@@ -60,7 +60,8 @@ for the NUCLEO-F446RE board.
 27. Add kernel object registry. Done.
 28. Add scheduler lock. Done.
 29. Add ISR-safe wake APIs. Done.
-30. Add idle hooks.
+30. Add idle hooks. Done.
+31. Add CPU usage snapshots.
 
 ## Cortex-M context switch model
 
@@ -216,3 +217,8 @@ ISR-safe wake APIs provide non-blocking entry points for interrupt context:
 `rtos_queue_send_isr()`. They may wake tasks and request PendSV, but they do not
 wait. The demo timer callback runs in the SysTick path and uses these APIs to
 set an event flag and post a semaphore.
+
+Idle hooks let the application run a short callback whenever the idle task is
+selected. The hook runs in Thread mode at idle priority, before the idle task
+executes `wfi`. It must not block, but it can maintain low-cost counters or
+enter board-specific low-power preparation code.
