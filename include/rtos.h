@@ -1,6 +1,7 @@
 #ifndef RTOS_H
 #define RTOS_H
 
+#include "rtos_mutex.h"
 #include "rtos_queue.h"
 #include "rtos_sem.h"
 #include "rtos_task.h"

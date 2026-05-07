@@ -40,7 +40,8 @@ for the NUCLEO-F446RE board.
 7. Add counting semaphores. Done.
 8. Add fixed-size message queues. Done.
 9. Add priority scheduling with same-priority round-robin. Done.
-10. Add mutexes and debug task listing.
+10. Add recursive mutexes. Done.
+11. Add priority inheritance and debug task listing.
 
 ## Cortex-M context switch model
 
@@ -83,3 +84,8 @@ opposite-side waiter when progress becomes possible.
 Tasks have integer priorities where larger values run first. The scheduler
 scans from the current task's successor and chooses the highest-priority ready
 task, preserving round-robin behavior among tasks with equal priority.
+
+Mutexes are exposed as `rtos_mutex_t`. A mutex tracks an owner task, recursive
+lock count, and wait FIFO. Unlocking the outermost lock releases ownership and
+wakes the oldest waiter. Priority inheritance is intentionally left for a later
+stage.
