@@ -3,6 +3,9 @@
 #include "port.h"
 #include "rtos_config.h"
 
+volatile uint32_t rtos_scheduler_lock_count;
+volatile uint32_t rtos_scheduler_pending;
+
 void rtos_start(void)
 {
     if (rtos_current_task == 0) {
@@ -26,6 +29,37 @@ void rtos_start(void)
 void rtos_yield(void)
 {
     port_trigger_pendsv();
+}
+
+void rtos_sched_lock(void)
+{
+    rtos_enter_critical();
+    rtos_scheduler_lock_count++;
+    rtos_exit_critical();
+}
+
+void rtos_sched_unlock(void)
+{
+    int should_yield = 0;
+
+    rtos_enter_critical();
+    if (rtos_scheduler_lock_count != 0U) {
+        rtos_scheduler_lock_count--;
+        if ((rtos_scheduler_lock_count == 0U) && (rtos_scheduler_pending != 0U)) {
+            rtos_scheduler_pending = 0;
+            should_yield = 1;
+        }
+    }
+    rtos_exit_critical();
+
+    if (should_yield != 0) {
+        rtos_yield();
+    }
+}
+
+uint32_t rtos_sched_lock_depth(void)
+{
+    return rtos_scheduler_lock_count;
 }
 
 void rtos_sleep(uint32_t ms)
@@ -53,6 +87,13 @@ void rtos_schedule_next(void)
     rtos_task_t *old_task = rtos_current_task;
     rtos_task_t *scan_task = old_task->next;
     rtos_task_t *best_task = 0;
+
+    if ((rtos_scheduler_lock_count != 0U) && (old_task->state == RTOS_TASK_RUNNING)) {
+        rtos_scheduler_pending = 1;
+        return;
+    }
+
+    rtos_scheduler_pending = 0;
 
     if (old_task->state == RTOS_TASK_RUNNING) {
         old_task->state = RTOS_TASK_READY;

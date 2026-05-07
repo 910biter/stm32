@@ -10,6 +10,7 @@ volatile uint32_t app_event_count;
 volatile uint32_t app_pool_count;
 volatile uint32_t app_exit_count;
 volatile uint32_t app_reuse_count;
+volatile uint32_t app_sched_lock_count;
 
 static rtos_queue_t led_queue;
 static uint32_t led_queue_storage[4];
@@ -83,6 +84,10 @@ static void timeout_task(void *arg)
                 reuse_created = 1;
             }
         }
+        rtos_sched_lock();
+        rtos_yield();
+        app_sched_lock_count++;
+        rtos_sched_unlock();
         rtos_sleep(50);
     }
 }

@@ -58,7 +58,8 @@ for the NUCLEO-F446RE board.
 25. Add probe symbol generation. Done.
 26. Add automated probe checks. Done.
 27. Add kernel object registry. Done.
-28. Add scheduler lock.
+28. Add scheduler lock. Done.
+29. Add ISR-safe wake APIs.
 
 ## Cortex-M context switch model
 
@@ -202,3 +203,9 @@ timers, event flag groups, and memory pools in a fixed table. Objects register
 themselves during initialization, and applications can attach debug names with
 `rtos_object_set_name()`. The registry is exported through SRAM snapshots so
 OpenOCD can show object addresses and types alongside task snapshots.
+
+The scheduler lock is a nestable preemption lock. While locked, PendSV requests
+from ticks, wakeups, or explicit yields are remembered in
+`rtos_scheduler_pending` instead of switching away from a still-running task.
+If the current task blocks or stops, the scheduler is still allowed to select a
+runnable task, which prevents a blocked task from continuing in Thread mode.

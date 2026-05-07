@@ -128,7 +128,8 @@ state, and HardFault state.
 24. Add probe symbol generation. Done.
 25. Add automated probe checks. Done.
 26. Add kernel object registry. Done.
-27. Add scheduler lock.
+27. Add scheduler lock. Done.
+28. Add ISR-safe wake APIs.
 
 ## Typical edit loop
 
